@@ -111,13 +111,13 @@ export const ProductCard = ({ product, onAddToCart, className }: ProductCardProp
             </span>
           </div>
 
-          <div className="flex gap-2">
+          <div className="flex gap-2 w-full">
             <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
               <DialogTrigger asChild>
-                <Button variant="outline" className="flex-1 text-xs sm:text-sm">
-                  <Eye className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-                  <span className="hidden xs:inline">View Details</span>
-                  <span className="xs:hidden">Details</span>
+                <Button variant="outline" className="flex-1 text-xs sm:text-sm px-2 sm:px-3">
+                  <Eye className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 flex-shrink-0" />
+                  <span className="hidden sm:inline whitespace-nowrap">View Details</span>
+                  <span className="sm:hidden">Details</span>
                 </Button>
               </DialogTrigger>
               <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -226,10 +226,10 @@ export const ProductCard = ({ product, onAddToCart, className }: ProductCardProp
             
             <Dialog>
               <DialogTrigger asChild>
-                <Button className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground text-xs sm:text-sm">
-                  <Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-                  <span className="hidden xs:inline">Add to Cart</span>
-                  <span className="xs:hidden">Add</span>
+                <Button className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground text-xs sm:text-sm px-2 sm:px-3">
+                  <Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 flex-shrink-0" />
+                  <span className="hidden sm:inline whitespace-nowrap">Add to Cart</span>
+                  <span className="sm:hidden">Add</span>
                 </Button>
               </DialogTrigger>
               <DialogContent className="sm:max-w-md">
