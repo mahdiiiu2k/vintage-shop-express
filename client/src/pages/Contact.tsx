@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { MapPin, Phone, Mail, Clock, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -11,7 +10,6 @@ import { useCart } from '@/hooks/useCart';
 import { useToast } from '@/hooks/use-toast';
 
 const Contact = () => {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [formData, setFormData] = useState({
     name: '',
@@ -19,6 +17,7 @@ const Contact = () => {
     subject: '',
     message: ''
   });
+  const { getTotalItems } = useCart();
   const { toast } = useToast();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -41,88 +40,27 @@ const Contact = () => {
       toast({
         title: "Please fill in all required fields",
         description: "Name, email, and message are required.",
+        variant: "destructive"
       });
     }
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Navigation */}
-      <nav className="bg-white shadow-sm border-b sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
-              <Link to="/" className="text-2xl font-bold text-gray-900">
-                VintageStyle
-              </Link>
-            </div>
-
-            {/* Desktop Menu */}
-            <div className="hidden md:flex items-center space-x-8">
-              <Link to="/" className="text-gray-900 hover:text-gray-600 transition">Home</Link>
-              <Link to="/shop" className="text-gray-900 hover:text-gray-600 transition">Shop</Link>
-              <Link to="/about" className="text-gray-900 hover:text-gray-600 transition">About</Link>
-              <Link to="/contact" className="text-gray-900 hover:text-gray-600 transition font-semibold">Contact</Link>
-            </div>
-
-            <div className="flex items-center space-x-4">
-              <div className="relative">
-                <Search className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                <Input
-                  type="text"
-                  placeholder="Search products..."
-                  className="pl-10 pr-4 py-2 w-64 hidden md:block"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
-              
-              <Button variant="outline">
-                <ShoppingCart className="w-5 h-5" />
-              </Button>
-              
-              <Button
-                variant="ghost"
-                className="md:hidden"
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              >
-                {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-              </Button>
-            </div>
-          </div>
-        </div>
-
-        {/* Mobile Menu */}
-        {isMobileMenuOpen && (
-          <div className="md:hidden bg-white border-t">
-            <div className="px-4 py-2 space-y-2">
-              <Input
-                type="text"
-                placeholder="Search products..."
-                className="w-full"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-              <div className="flex flex-col space-y-2">
-                <Link to="/" className="block px-3 py-2 text-gray-900 hover:bg-gray-50">Home</Link>
-                <Link to="/shop" className="block px-3 py-2 text-gray-900 hover:bg-gray-50">Shop</Link>
-                <Link to="/about" className="block px-3 py-2 text-gray-900 hover:bg-gray-50">About</Link>
-                <Link to="/contact" className="block px-3 py-2 text-gray-900 hover:bg-gray-50 font-semibold">Contact</Link>
-              </div>
-            </div>
-          </div>
-        )}
-      </nav>
+    <div className="min-h-screen bg-background">
+      <Navigation 
+        cartItemCount={getTotalItems()}
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+      />
 
       {/* Contact Hero */}
-      <section className="bg-gradient-to-r from-gray-50 to-gray-100 py-20">
+      <section className="bg-gradient-to-r from-background to-accent py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
+          <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-6">
             Get in Touch
           </h1>
-          <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-            Have questions about our products or need assistance? We're here to help. 
-            Reach out to us and we'll get back to you as soon as possible.
+          <p className="text-xl text-muted-foreground mb-8 max-w-3xl mx-auto">
+            We'd love to hear from you. Send us a message and we'll respond as soon as possible.
           </p>
         </div>
       </section>
@@ -133,84 +71,83 @@ const Contact = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
             {/* Contact Form */}
             <div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-6">Send us a Message</h2>
+              <h2 className="text-3xl font-bold text-foreground mb-6">Send us a Message</h2>
               <form onSubmit={handleSubmit} className="space-y-6">
-                <div>
-                  <Label htmlFor="name">Full Name *</Label>
-                  <Input
-                    id="name"
-                    name="name"
-                    type="text"
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    className="mt-1"
-                    required
-                  />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="name" className="text-foreground">Name *</Label>
+                    <Input
+                      id="name"
+                      name="name"
+                      type="text"
+                      placeholder="Your name"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      className="mt-1"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="email" className="text-foreground">Email *</Label>
+                    <Input
+                      id="email"
+                      name="email"
+                      type="email"
+                      placeholder="your.email@example.com"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      className="mt-1"
+                      required
+                    />
+                  </div>
                 </div>
-
                 <div>
-                  <Label htmlFor="email">Email Address *</Label>
-                  <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    className="mt-1"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="subject">Subject</Label>
+                  <Label htmlFor="subject" className="text-foreground">Subject</Label>
                   <Input
                     id="subject"
                     name="subject"
                     type="text"
+                    placeholder="What's this about?"
                     value={formData.subject}
                     onChange={handleInputChange}
                     className="mt-1"
                   />
                 </div>
-
                 <div>
-                  <Label htmlFor="message">Message *</Label>
-                  <textarea
+                  <Label htmlFor="message" className="text-foreground">Message *</Label>
+                  <Textarea
                     id="message"
                     name="message"
-                    rows={6}
+                    placeholder="Tell us how we can help you..."
                     value={formData.message}
                     onChange={handleInputChange}
-                    className="mt-1 flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="mt-1 min-h-[120px]"
                     required
                   />
                 </div>
-
-                <Button 
-                  type="submit"
-                  size="lg" 
-                  className="w-full bg-black text-white hover:bg-gray-800"
-                >
+                <Button type="submit" size="lg" className="w-full">
+                  <Send className="w-4 h-4 mr-2" />
                   Send Message
                 </Button>
               </form>
             </div>
 
-            {/* Contact Information */}
+            {/* Contact Info */}
             <div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-6">Contact Information</h2>
-              
+              <h2 className="text-3xl font-bold text-foreground mb-6">Contact Information</h2>
               <div className="space-y-6">
                 <Card>
-                  <CardContent className="p-6">
+                  <CardContent className="pt-6">
                     <div className="flex items-start space-x-4">
-                      <MapPin className="w-6 h-6 text-gray-600 mt-1" />
+                      <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <MapPin className="w-5 h-5 text-primary" />
+                      </div>
                       <div>
-                        <h3 className="font-semibold text-gray-900 mb-2">Our Location</h3>
-                        <p className="text-gray-600">
+                        <h3 className="font-semibold text-foreground mb-1">Our Address</h3>
+                        <p className="text-muted-foreground">
                           123 Fashion Street<br />
-                          Algiers, Algeria<br />
-                          16000
+                          Shibuya, Tokyo 150-0001<br />
+                          Japan
                         </p>
                       </div>
                     </div>
@@ -218,42 +155,53 @@ const Contact = () => {
                 </Card>
 
                 <Card>
-                  <CardContent className="p-6">
+                  <CardContent className="pt-6">
                     <div className="flex items-start space-x-4">
-                      <Phone className="w-6 h-6 text-gray-600 mt-1" />
-                      <div>
-                        <h3 className="font-semibold text-gray-900 mb-2">Phone</h3>
-                        <p className="text-gray-600">+213 555 123 456</p>
-                        <p className="text-gray-600">+213 555 789 012</p>
+                      <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <Phone className="w-5 h-5 text-primary" />
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardContent className="p-6">
-                    <div className="flex items-start space-x-4">
-                      <Mail className="w-6 h-6 text-gray-600 mt-1" />
                       <div>
-                        <h3 className="font-semibold text-gray-900 mb-2">Email</h3>
-                        <p className="text-gray-600">info@vintagestyle.com</p>
-                        <p className="text-gray-600">support@vintagestyle.com</p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardContent className="p-6">
-                    <div className="flex items-start space-x-4">
-                      <Clock className="w-6 h-6 text-gray-600 mt-1" />
-                      <div>
-                        <h3 className="font-semibold text-gray-900 mb-2">Business Hours</h3>
-                        <p className="text-gray-600">
-                          Monday - Friday: 9:00 AM - 6:00 PM<br />
-                          Saturday: 10:00 AM - 4:00 PM<br />
-                          Sunday: Closed
+                        <h3 className="font-semibold text-foreground mb-1">Phone</h3>
+                        <p className="text-muted-foreground">
+                          +81 3-1234-5678<br />
+                          <span className="text-sm">Mon-Fri 9:00-18:00 JST</span>
                         </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardContent className="pt-6">
+                    <div className="flex items-start space-x-4">
+                      <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <Mail className="w-5 h-5 text-primary" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-foreground mb-1">Email</h3>
+                        <p className="text-muted-foreground">
+                          hello@vintagestyle.com<br />
+                          support@vintagestyle.com
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardContent className="pt-6">
+                    <div className="flex items-start space-x-4">
+                      <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <Clock className="w-5 h-5 text-primary" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-foreground mb-1">Business Hours</h3>
+                        <div className="text-muted-foreground text-sm space-y-1">
+                          <p>Monday - Friday: 9:00 AM - 6:00 PM</p>
+                          <p>Saturday: 10:00 AM - 4:00 PM</p>
+                          <p>Sunday: Closed</p>
+                          <p className="text-xs mt-2">All times in JST (Japan Standard Time)</p>
+                        </div>
                       </div>
                     </div>
                   </CardContent>
@@ -265,58 +213,57 @@ const Contact = () => {
       </section>
 
       {/* FAQ Section */}
-      <section className="py-16 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-16 bg-muted/50">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Frequently Asked Questions</h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Find answers to common questions about our products, shipping, and policies.
+            <h2 className="text-3xl font-bold text-foreground mb-4">Frequently Asked Questions</h2>
+            <p className="text-muted-foreground">
+              Quick answers to common questions
             </p>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          
+          <div className="space-y-6">
             <Card>
-              <CardContent className="p-6">
-                <h3 className="font-semibold text-gray-900 mb-3">What is your return policy?</h3>
-                <p className="text-gray-600">
-                  We offer a 30-day return policy for all unworn items in original condition. 
-                  Please contact us to initiate a return.
+              <CardContent className="pt-6">
+                <h3 className="font-semibold text-foreground mb-2">What are your shipping options?</h3>
+                <p className="text-muted-foreground">
+                  We offer standard shipping (5-7 business days) and express shipping (2-3 business days). 
+                  Free standard shipping on orders over ¥10,000.
                 </p>
               </CardContent>
             </Card>
 
             <Card>
-              <CardContent className="p-6">
-                <h3 className="font-semibold text-gray-900 mb-3">How long does shipping take?</h3>
-                <p className="text-gray-600">
-                  Standard shipping within Algeria takes 3-5 business days. Express shipping 
-                  is available for next-day delivery in major cities.
+              <CardContent className="pt-6">
+                <h3 className="font-semibold text-foreground mb-2">What's your return policy?</h3>
+                <p className="text-muted-foreground">
+                  We accept returns within 30 days of delivery. Items must be unworn, unwashed, 
+                  and in original condition with tags attached.
                 </p>
               </CardContent>
             </Card>
 
             <Card>
-              <CardContent className="p-6">
-                <h3 className="font-semibold text-gray-900 mb-3">Do you offer international shipping?</h3>
-                <p className="text-gray-600">
-                  Currently, we only ship within Algeria. We're working on expanding 
-                  international shipping options.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-6">
-                <h3 className="font-semibold text-gray-900 mb-3">How can I track my order?</h3>
-                <p className="text-gray-600">
-                  You'll receive a tracking number via email once your order ships. 
-                  Use this number to track your package on our website.
+              <CardContent className="pt-6">
+                <h3 className="font-semibold text-foreground mb-2">Do you ship internationally?</h3>
+                <p className="text-muted-foreground">
+                  Yes! We ship worldwide. International shipping rates and delivery times vary by destination. 
+                  Check our shipping page for specific details.
                 </p>
               </CardContent>
             </Card>
           </div>
         </div>
       </section>
+
+      {/* Footer */}
+      <footer className="bg-background border-t border-border py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <p className="text-muted-foreground">
+            &copy; 2025 VintageStyle. We're here to help.
+          </p>
+        </div>
+      </footer>
     </div>
   );
 };
