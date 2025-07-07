@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Filter, Grid, List } from 'lucide-react';
+import { Filter, Grid, List, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
@@ -33,6 +33,43 @@ const Shop = () => {
   const [priceRange, setPriceRange] = useState('all');
   const { addToCart, getTotalItems } = useCart();
   const { toast } = useToast();
+
+  const refreshProducts = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch('/api/products?t=' + Date.now());
+      if (response.ok) {
+        const data = await response.json();
+        const formattedProducts = data.map((product: any) => ({
+          id: product.id,
+          name: product.name,
+          price: parseFloat(product.price),
+          image: product.image_url || "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=400&h=500&fit=crop",
+          rating: 5,
+          reviews: 12,
+          category: product.category || "General",
+          sizes: product.sizes || ["S", "M", "L", "XL"],
+          colors: product.colors || ["White", "Black", "Blue"],
+          description: product.description || "Premium quality product."
+        }));
+        setProducts(formattedProducts);
+        toast({
+          title: "Products refreshed!",
+          description: `Loaded ${formattedProducts.length} products from database.`,
+        });
+      } else {
+        throw new Error('Failed to fetch products');
+      }
+    } catch (error) {
+      console.error('Error refreshing products:', error);
+      toast({
+        title: "Database connection issue",
+        description: "Showing sample products. The connection will work when deployed.",
+        variant: "destructive",
+      });
+    }
+    setLoading(false);
+  };
 
   // Load products from API
   useEffect(() => {
@@ -100,7 +137,7 @@ const Shop = () => {
           description: "Classic denim jacket with vintage styling. Durable and timeless design."
         },
         {
-          id: 3,
+          id: 4,
           name: "Elegant Black Dress",
           price: 6200,
           image: "https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=400&h=500&fit=crop",
@@ -112,7 +149,7 @@ const Shop = () => {
           description: "Sophisticated black dress suitable for formal events and special occasions."
         },
         {
-          id: 4,
+          id: 5,
           name: "Casual Cotton T-Shirt",
           price: 2850,
           image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&h=500&fit=crop",
@@ -124,7 +161,7 @@ const Shop = () => {
           description: "Comfortable cotton t-shirt for everyday wear. Soft fabric and relaxed fit."
         },
         {
-          id: 5,
+          id: 6,
           name: "Summer Floral Dress",
           price: 5500,
           image: "https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=400&h=500&fit=crop",
@@ -136,7 +173,7 @@ const Shop = () => {
           description: "Beautiful floral dress perfect for summer occasions. Light and airy fabric."
         },
         {
-          id: 6,
+          id: 7,
           name: "Premium Wool Sweater",
           price: 7200,
           image: "https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=400&h=500&fit=crop",
@@ -148,7 +185,7 @@ const Shop = () => {
           description: "Luxurious wool sweater for cold weather. Warm and stylish design."
         },
         {
-          id: 7,
+          id: 8,
           name: "Slim Fit Chinos",
           price: 3900,
           image: "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=400&h=500&fit=crop",
@@ -160,7 +197,7 @@ const Shop = () => {
           description: "Versatile chinos perfect for casual and semi-formal occasions."
         },
         {
-          id: 8,
+          id: 9,
           name: "Leather Crossbody Bag",
           price: 6800,
           image: "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=400&h=500&fit=crop",
@@ -224,9 +261,21 @@ const Shop = () => {
 
         {/* Filters */}
         <div className="mb-8 p-6 bg-card border border-border rounded-lg">
-          <div className="flex items-center gap-4 mb-4">
-            <Filter className="w-5 h-5 text-muted-foreground" />
-            <h2 className="text-lg font-semibold text-foreground">Filters</h2>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-4">
+              <Filter className="w-5 h-5 text-muted-foreground" />
+              <h2 className="text-lg font-semibold text-foreground">Filters</h2>
+            </div>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={refreshProducts}
+              disabled={loading}
+              className="flex items-center gap-2"
+            >
+              <RefreshCw className={cn("h-4 w-4", loading && "animate-spin")} />
+              {loading ? "Refreshing..." : "Refresh Products"}
+            </Button>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
