@@ -103,3 +103,49 @@ All colors MUST be HSL.
     @apply bg-background text-foreground;
   }
 }
+
+/* Mobile optimizations */
+@media (max-width: 640px) {
+  /* Improve touch targets */
+  button, a, [role="button"] {
+    min-height: 44px;
+  }
+  
+  /* Better spacing for small screens */
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  /* Better card spacing */
+  .grid {
+    gap: 0.75rem;
+  }
+  
+  /* Improve dialog sizing */
+  [role="dialog"] {
+    margin: 0.5rem;
+    max-height: calc(100vh - 1rem);
+  }
+  
+  /* Better input sizing */
+  input, select, textarea {
+    font-size: 16px; /* Prevents zoom on iOS */
+    min-height: 44px;
+  }
+}
+
+/* Extra small phone optimizations */
+@media (max-width: 480px) {
+  /* Even smaller spacing */
+  .px-4 {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+  
+  /* Smaller text for very small screens */
+  .text-lg {
+    font-size: 1rem;
+    line-height: 1.5rem;
+  }
+}

@@ -176,11 +176,11 @@ const Shop = () => {
         onSearchChange={setSearchTerm}
       />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-4">Shop Collection</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-3 sm:mb-4">Shop Collection</h1>
+          <p className="text-sm sm:text-base text-muted-foreground">
             Discover our curated selection of timeless fashion pieces.
           </p>
         </div>
@@ -278,9 +278,9 @@ const Shop = () => {
         {/* Products Grid */}
         {loading ? (
           <div className={cn(
-            "grid gap-6",
+            "grid gap-3 sm:gap-4 md:gap-6",
             viewMode === 'grid' 
-              ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" 
+              ? "grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4" 
               : "grid-cols-1"
           )}>
             {[...Array(8)].map((_, i) => (
@@ -289,9 +289,9 @@ const Shop = () => {
           </div>
         ) : sortedProducts.length > 0 ? (
           <div className={cn(
-            "grid gap-6",
+            "grid gap-3 sm:gap-4 md:gap-6",
             viewMode === 'grid' 
-              ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" 
+              ? "grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4" 
               : "grid-cols-1"
           )}>
             {sortedProducts.map(product => (

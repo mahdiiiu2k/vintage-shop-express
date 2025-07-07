@@ -73,9 +73,9 @@ const Contact = () => {
             <div>
               <h2 className="text-3xl font-bold text-foreground mb-6">Send us a Message</h2>
               <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="name" className="text-foreground">Name *</Label>
+                    <Label htmlFor="name" className="text-foreground text-sm">Name *</Label>
                     <Input
                       id="name"
                       name="name"
@@ -83,12 +83,12 @@ const Contact = () => {
                       placeholder="Your name"
                       value={formData.name}
                       onChange={handleInputChange}
-                      className="mt-1"
+                      className="mt-1 h-12"
                       required
                     />
                   </div>
                   <div>
-                    <Label htmlFor="email" className="text-foreground">Email *</Label>
+                    <Label htmlFor="email" className="text-foreground text-sm">Email *</Label>
                     <Input
                       id="email"
                       name="email"
@@ -96,13 +96,13 @@ const Contact = () => {
                       placeholder="your.email@example.com"
                       value={formData.email}
                       onChange={handleInputChange}
-                      className="mt-1"
+                      className="mt-1 h-12"
                       required
                     />
                   </div>
                 </div>
                 <div>
-                  <Label htmlFor="subject" className="text-foreground">Subject</Label>
+                  <Label htmlFor="subject" className="text-foreground text-sm">Subject</Label>
                   <Input
                     id="subject"
                     name="subject"
@@ -110,22 +110,22 @@ const Contact = () => {
                     placeholder="What's this about?"
                     value={formData.subject}
                     onChange={handleInputChange}
-                    className="mt-1"
+                    className="mt-1 h-12"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="message" className="text-foreground">Message *</Label>
+                  <Label htmlFor="message" className="text-foreground text-sm">Message *</Label>
                   <Textarea
                     id="message"
                     name="message"
                     placeholder="Tell us how we can help you..."
                     value={formData.message}
                     onChange={handleInputChange}
-                    className="mt-1 min-h-[120px]"
+                    className="mt-1 min-h-[100px] sm:min-h-[120px] text-base"
                     required
                   />
                 </div>
-                <Button type="submit" size="lg" className="w-full">
+                <Button type="submit" size="lg" className="w-full h-12 text-base">
                   <Send className="w-4 h-4 mr-2" />
                   Send Message
                 </Button>

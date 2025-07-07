@@ -114,27 +114,28 @@ export const ProductCard = ({ product, onAddToCart, className }: ProductCardProp
           <div className="flex gap-2">
             <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
               <DialogTrigger asChild>
-                <Button variant="outline" className="flex-1">
-                  <Eye className="w-4 h-4 mr-2" />
-                  View Details
+                <Button variant="outline" className="flex-1 text-xs sm:text-sm">
+                  <Eye className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                  <span className="hidden xs:inline">View Details</span>
+                  <span className="xs:hidden">Details</span>
                 </Button>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-2xl">
+              <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
-                  <DialogTitle className="text-xl">{product.name}</DialogTitle>
+                  <DialogTitle className="text-lg sm:text-xl">{product.name}</DialogTitle>
                 </DialogHeader>
-                <div className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-4 sm:space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                     <div>
                       <img
                         src={product.image}
                         alt={product.name}
-                        className="w-full h-64 object-cover rounded-lg"
+                        className="w-full h-48 sm:h-64 object-cover rounded-lg"
                       />
                     </div>
-                    <div className="space-y-4">
+                    <div className="space-y-3 sm:space-y-4">
                       <div>
-                        <span className="text-3xl font-bold text-foreground">
+                        <span className="text-2xl sm:text-3xl font-bold text-foreground">
                           ¥{product.price.toLocaleString()}
                         </span>
                         <div className="flex items-center space-x-2 mt-2">
@@ -142,11 +143,11 @@ export const ProductCard = ({ product, onAddToCart, className }: ProductCardProp
                             {[...Array(5)].map((_, i) => (
                               <Star 
                                 key={i} 
-                                className={`w-4 h-4 ${i < Math.floor(product.rating) ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`} 
+                                className={`w-3 h-3 sm:w-4 sm:h-4 ${i < Math.floor(product.rating) ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`} 
                               />
                             ))}
                           </div>
-                          <span className="text-sm text-muted-foreground">
+                          <span className="text-xs sm:text-sm text-muted-foreground">
                             {product.rating} ({product.reviews} reviews)
                           </span>
                         </div>
@@ -225,9 +226,10 @@ export const ProductCard = ({ product, onAddToCart, className }: ProductCardProp
             
             <Dialog>
               <DialogTrigger asChild>
-                <Button className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground">
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add to Cart
+                <Button className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground text-xs sm:text-sm">
+                  <Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                  <span className="hidden xs:inline">Add to Cart</span>
+                  <span className="xs:hidden">Add</span>
                 </Button>
               </DialogTrigger>
               <DialogContent className="sm:max-w-md">
