@@ -1,11 +1,13 @@
 
 import { useState } from 'react';
-import { Link } from 'wouter';
-import { ShoppingCart, Menu, X, Search, MapPin, Phone, Mail, Clock } from 'lucide-react';
+import { MapPin, Phone, Mail, Clock, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Navigation } from '@/components/Navigation';
+import { useCart } from '@/hooks/useCart';
 import { useToast } from '@/hooks/use-toast';
 
 const Contact = () => {

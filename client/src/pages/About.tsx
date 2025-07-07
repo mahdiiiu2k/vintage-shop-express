@@ -1,13 +1,13 @@
 
-import { Link } from 'wouter';
-import { ShoppingCart, Menu, X, Search } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { useState } from 'react';
+import { Users, Award, Heart, Globe } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Navigation } from '@/components/Navigation';
+import { useCart } from '@/hooks/useCart';
 
 const About = () => {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const { getTotalItems } = useCart();
 
   return (
     <div className="min-h-screen bg-white">
