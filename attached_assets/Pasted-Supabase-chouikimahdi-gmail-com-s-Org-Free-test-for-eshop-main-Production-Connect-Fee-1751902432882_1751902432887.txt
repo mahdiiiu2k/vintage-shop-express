@@ -1,0 +1,169 @@
+Supabase
+chouikimahdi@gmail.com's Org
+Free
+
+test for eshop
+
+main
+Production
+
+
+Connect
+Feedback
+
+
+
+
+
+
+Settings
+Project Settings
+General
+Compute and Disk
+Infrastructure
+Integrations
+API Keys
+NEW
+JWT Keys
+NEW
+Add Ons
+Vault
+Alpha
+Configuration
+Database
+Data API
+Authentication
+Storage
+Edge Functions
+Log Drains
+Billing
+Subscription
+Usage
+Database Settings
+Connection string has moved
+
+You can find Project connect details by clicking 'Connect' in the top bar
+
+
+Project name
+
+Connect
+
+Enable Branching
+Database password
+
+You can use this password to connect directly to your Postgres database.
+
+
+Reset database password
+Connection pooling configuration
+
+Shared Pooler
+Docs
+Pool Size
+15
+The maximum number of connections made to the underlying Postgres cluster, per user+db combination. Pool size has a default of 15 based on your compute size of Nano.
+
+Max Client Connections
+200
+The maximum number of concurrent client connections allowed. This value is fixed at 200 based on your compute size of Nano and cannot be changed.
+
+Please refer to our documentation to find out more.
+
+
+Cancel
+
+Save
+SSL Configuration
+Docs
+Enforce SSL on incoming connections
+Reject non-SSL connections to your database
+
+
+SSL Certificate
+
+Use this certificate when connecting to your database to prevent snooping and man-in-the-middle attacks.
+
+
+Download certificate
+Disk Management
+Docs
+Disk Management has moved
+Disk configuration is now managed alongside Project Compute on the new Compute and Disk page.
+Go to Compute and Disk
+Network Restrictions
+Allow specific IP ranges to have access to your database.
+Docs
+
+Add restriction
+Your database can be accessed by all IP addresses
+
+You may start limiting access to your database by adding a network restriction.
+
+
+Restrict all access
+Network Bans
+List of IP addresses that are temporarily blocked if their traffic pattern looks abusive
+Docs
+There are no banned IP addresses for your project.
+
+Database | Supabase
+Connect to your project
+Get the connection strings and environment variables for your app
+
+Connection String
+App Frameworks
+Mobile Frameworks
+ORMs
+Type
+
+URI
+Source
+
+Primary database
+Direct connection
+Ideal for applications with persistent, long-lived connections, such as those running on virtual machines or long-standing containers.
+
+postgresql://postgres:[YOUR-PASSWORD]@db.vmhlyznvkokfljrtpaqs.supabase.co:5432/postgres
+
+
+View parameters
+Suitable for long-lived, persistent connections
+Each client has a dedicated connection to Postgres
+Not IPv4 compatible
+Use Session Pooler if on a IPv4 network or purchase IPv4 add-on
+IPv4 add-on
+Pooler settings
+
+Some platforms are IPv4-only:
+Transaction pooler
+Shared Pooler
+Ideal for stateless applications like serverless functions where each interaction with Postgres is brief and isolated.
+
+postgresql://postgres.vmhlyznvkokfljrtpaqs:[YOUR-PASSWORD]@aws-0-us-west-1.pooler.supabase.com:6543/postgres
+
+Does not support PREPARE statements
+
+
+View parameters
+Suitable for a large number of connected clients
+Pre-warmed connection pool to Postgres
+IPv4 compatible
+Transaction pooler connections are IPv4 proxied for free.
+Session pooler
+Shared Pooler
+Only recommended as an alternative to Direct Connection, when connecting via an IPv4 network.
+
+postgresql://postgres.vmhlyznvkokfljrtpaqs:[YOUR-PASSWORD]@aws-0-us-west-1.pooler.supabase.com:5432/postgres
+
+
+View parameters
+IPv4 compatible
+Session pooler connections are IPv4 proxied for free
+Only use on a IPv4 network
+Use Direct Connection if connecting via an IPv6 network
+Reset your database password
+
+You may reset your database password in your project's Database Settings
+
+Close
