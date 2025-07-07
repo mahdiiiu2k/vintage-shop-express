@@ -1,11 +1,14 @@
-import { useState } from 'react';
+
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { ShoppingCart, Star, Search, Menu, X, Plus, Minus, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import Navigation from '@/components/Navigation';
-import ProductCard from '@/components/ProductCard';
-import CartModal from '@/components/CartModal';
 
 interface Product {
   id: number;
@@ -107,6 +110,7 @@ const Index = () => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [email, setEmail] = useState('');
   const { toast } = useToast();
@@ -165,6 +169,10 @@ const Index = () => {
     });
   };
 
+  const getTotalPrice = () => {
+    return cartItems.reduce((total, item) => total + (item.product.price * item.quantity), 0);
+  };
+
   const handleSubscribe = () => {
     if (email) {
       toast({
@@ -175,37 +183,241 @@ const Index = () => {
     }
   };
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
-      <Navigation 
-        searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
-        cartItems={cartItems}
-        onCartClick={() => setIsCartOpen(true)}
-      />
+  const formatPrice = (price: number) => {
+    return `${price.toLocaleString()}.00د.ج`;
+  };
 
-      <CartModal 
-        isOpen={isCartOpen}
-        onClose={() => setIsCartOpen(false)}
-        cartItems={cartItems}
-        onUpdateQuantity={updateQuantity}
-        onRemoveItem={removeFromCart}
+  const renderStars = (rating: number) => {
+    return Array.from({ length: 5 }, (_, i) => (
+      <Star
+        key={i}
+        className={`w-4 h-4 ${i < rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`}
       />
+    ));
+  };
+
+  const ProductCard = ({ product }: { product: Product }) => {
+    const [selectedSize, setSelectedSize] = useState(product.sizes[0]);
+    const [selectedColor, setSelectedColor] = useState(product.colors[0]);
+
+    return (
+      <Card className="group hover:shadow-xl transition-all duration-300 border-0 shadow-lg">
+        <div className="relative overflow-hidden rounded-t-lg">
+          <img
+            src={product.image}
+            alt={product.name}
+            className="w-full h-80 object-cover group-hover:scale-105 transition-transform duration-300"
+          />
+          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-300" />
+        </div>
+        <CardContent className="p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">{product.name}</h3>
+          <p className="text-sm text-gray-600 mb-3">{product.description}</p>
+          <div className="flex items-center mb-3">
+            <div className="flex items-center mr-2">
+              {renderStars(product.rating)}
+            </div>
+            <span className="text-sm text-gray-500">({product.reviews} reviews)</span>
+          </div>
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-2xl font-bold text-gray-900">{formatPrice(product.price)}</span>
+            <Badge variant="secondary">{product.category}</Badge>
+          </div>
+          
+          <div className="space-y-3 mb-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Size</label>
+              <Select value={selectedSize} onValueChange={setSelectedSize}>
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {product.sizes.map((size) => (
+                    <SelectItem key={size} value={size}>{size}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Color</label>
+              <Select value={selectedColor} onValueChange={setSelectedColor}>
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {product.colors.map((color) => (
+                    <SelectItem key={color} value={color}>{color}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          
+          <Button
+            onClick={() => addToCart(product, selectedSize, selectedColor)}
+            className="w-full bg-black text-white hover:bg-gray-800 transition-colors"
+          >
+            Add to Cart
+          </Button>
+        </CardContent>
+      </Card>
+    );
+  };
+
+  return (
+    <div className="min-h-screen bg-white">
+      {/* Navigation */}
+      <nav className="bg-white shadow-sm border-b sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center">
+              <Link to="/" className="text-2xl font-bold text-gray-900">
+                VintageStyle
+              </Link>
+            </div>
+
+            {/* Desktop Menu */}
+            <div className="hidden md:flex items-center space-x-8">
+              <Link to="/" className="text-gray-900 hover:text-gray-600 transition">Home</Link>
+              <Link to="/shop" className="text-gray-900 hover:text-gray-600 transition">Shop</Link>
+              <Link to="/about" className="text-gray-900 hover:text-gray-600 transition">About</Link>
+              <Link to="/contact" className="text-gray-900 hover:text-gray-600 transition">Contact</Link>
+            </div>
+
+            <div className="flex items-center space-x-4">
+              <div className="relative">
+                <Search className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <Input
+                  type="text"
+                  placeholder="Search products..."
+                  className="pl-10 pr-4 py-2 w-64 hidden md:block"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+              
+              <Dialog open={isCartOpen} onOpenChange={setIsCartOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="outline" className="relative">
+                    <ShoppingCart className="w-5 h-5" />
+                    {cartItems.length > 0 && (
+                      <Badge className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
+                        {cartItems.reduce((total, item) => total + item.quantity, 0)}
+                      </Badge>
+                    )}
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>Shopping Cart</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    {cartItems.length === 0 ? (
+                      <p className="text-center text-gray-500 py-8">Your cart is empty</p>
+                    ) : (
+                      <>
+                        {cartItems.map((item) => (
+                          <div key={item.id} className="flex items-center space-x-4 p-4 border rounded-lg">
+                            <img
+                              src={item.product.image}
+                              alt={item.product.name}
+                              className="w-16 h-16 object-cover rounded"
+                            />
+                            <div className="flex-1">
+                              <h4 className="font-semibold">{item.product.name}</h4>
+                              <p className="text-sm text-gray-600">
+                                Size: {item.selectedSize}, Color: {item.selectedColor}
+                              </p>
+                              <p className="font-bold">{formatPrice(item.product.price)}</p>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                              >
+                                <Minus className="w-4 h-4" />
+                              </Button>
+                              <span className="w-8 text-center">{item.quantity}</span>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                              >
+                                <Plus className="w-4 h-4" />
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => removeFromCart(item.id)}
+                                className="text-red-600"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
+                        <div className="border-t pt-4">
+                          <div className="flex justify-between items-center mb-4">
+                            <span className="text-xl font-bold">Total: {formatPrice(getTotalPrice())}</span>
+                          </div>
+                          <Button className="w-full bg-black text-white hover:bg-gray-800">
+                            Proceed to Checkout
+                          </Button>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </DialogContent>
+              </Dialog>
+              
+              <Button
+                variant="ghost"
+                className="md:hidden"
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              >
+                {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile Menu */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden bg-white border-t">
+            <div className="px-4 py-2 space-y-2">
+              <Input
+                type="text"
+                placeholder="Search products..."
+                className="w-full"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              <div className="flex flex-col space-y-2">
+                <Link to="/" className="block px-3 py-2 text-gray-900 hover:bg-gray-50">Home</Link>
+                <Link to="/shop" className="block px-3 py-2 text-gray-900 hover:bg-gray-50">Shop</Link>
+                <Link to="/about" className="block px-3 py-2 text-gray-900 hover:bg-gray-50">About</Link>
+                <Link to="/contact" className="block px-3 py-2 text-gray-900 hover:bg-gray-50">Contact</Link>
+              </div>
+            </div>
+          </div>
+        )}
+      </nav>
 
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 py-24 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.03"%3E%3Ccircle cx="30" cy="30" r="1"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-50"></div>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative">
-          <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 animate-fade-in">
-            Discover Your <span className="bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">Style</span>
+      <section className="bg-gradient-to-r from-gray-50 to-gray-100 py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
+            Discover Your Style
           </h1>
-          <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto animate-fade-in">
+          <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
             Curated collection of premium clothing for the modern wardrobe. 
             Quality pieces that define your unique aesthetic.
           </p>
           <Button 
             size="lg" 
-            className="bg-white text-gray-900 hover:bg-gray-100 px-8 py-4 text-lg font-semibold transition-all duration-300 transform hover:scale-105 animate-fade-in"
+            className="bg-black text-white hover:bg-gray-800 px-8 py-3"
             onClick={() => document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' })}
           >
             Shop Now
@@ -214,15 +426,15 @@ const Index = () => {
       </section>
 
       {/* Category Filter */}
-      <section className="py-8 bg-white/80 backdrop-blur-sm border-b">
+      <section className="py-8 bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-wrap gap-3 justify-center">
+          <div className="flex flex-wrap gap-2 justify-center">
             {categories.map((category) => (
               <Button
                 key={category}
                 variant={selectedCategory === category ? "default" : "outline"}
                 onClick={() => setSelectedCategory(category)}
-                className="transition-all duration-300 hover:scale-105"
+                className="transition-all"
               >
                 {category}
               </Button>
@@ -234,56 +446,31 @@ const Index = () => {
       {/* Products Grid */}
       <section id="products" className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Featured Products</h2>
-            <p className="text-lg text-gray-600">Discover our handpicked selection of premium fashion pieces</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            {filteredProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
           </div>
-          
-          {filteredProducts.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-lg text-gray-600">No products found matching your criteria.</p>
-              <Button 
-                variant="outline" 
-                onClick={() => {
-                  setSearchTerm('');
-                  setSelectedCategory('All');
-                }}
-                className="mt-4"
-              >
-                Clear Filters
-              </Button>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-              {filteredProducts.map((product) => (
-                <ProductCard 
-                  key={product.id} 
-                  product={product} 
-                  onAddToCart={addToCart}
-                />
-              ))}
-            </div>
-          )}
         </div>
       </section>
 
       {/* Newsletter Section */}
-      <section className="bg-gradient-to-r from-gray-900 to-gray-800 py-16">
+      <section className="bg-gray-50 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">Stay in Style</h2>
-          <p className="text-lg text-gray-300 mb-8">
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">Stay in Style</h2>
+          <p className="text-lg text-gray-600 mb-8">
             Subscribe to our newsletter for the latest fashion trends and exclusive offers.
           </p>
           <div className="max-w-md mx-auto flex gap-4">
             <Input
               type="email"
               placeholder="Enter your email"
-              className="flex-1 bg-white/10 border-white/20 text-white placeholder:text-gray-300"
+              className="flex-1"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
             <Button 
-              className="bg-white text-gray-900 hover:bg-gray-100 transition-all duration-300"
+              className="bg-black text-white hover:bg-gray-800"
               onClick={handleSubscribe}
             >
               Subscribe
