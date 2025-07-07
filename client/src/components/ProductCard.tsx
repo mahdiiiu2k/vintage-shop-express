@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Star, Plus, Heart } from 'lucide-react';
+import { Star, Plus, Heart, Eye, ShoppingCart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -31,6 +31,7 @@ export const ProductCard = ({ product, onAddToCart, className }: ProductCardProp
   const [selectedSize, setSelectedSize] = useState('');
   const [selectedColor, setSelectedColor] = useState('');
   const [isWishlisted, setIsWishlisted] = useState(false);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const { toast } = useToast();
 
   const handleAddToCart = () => {
@@ -110,66 +111,179 @@ export const ProductCard = ({ product, onAddToCart, className }: ProductCardProp
             </span>
           </div>
 
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
-                <Plus className="w-4 h-4 mr-2" />
-                Add to Cart
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-md">
-              <DialogHeader>
-                <DialogTitle>{product.name}</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-4">
-                <img
-                  src={product.image}
-                  alt={product.name}
-                  className="w-full h-48 object-cover rounded-lg"
-                />
-                <p className="text-sm text-muted-foreground">{product.description}</p>
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-sm font-medium text-foreground mb-2 block">Size</label>
-                    <Select value={selectedSize} onValueChange={setSelectedSize}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select size" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {product.sizes.map(size => (
-                          <SelectItem key={size} value={size}>{size}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+          <div className="flex gap-2">
+            <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
+              <DialogTrigger asChild>
+                <Button variant="outline" className="flex-1">
+                  <Eye className="w-4 h-4 mr-2" />
+                  View Details
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-2xl">
+                <DialogHeader>
+                  <DialogTitle className="text-xl">{product.name}</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <img
+                        src={product.image}
+                        alt={product.name}
+                        className="w-full h-64 object-cover rounded-lg"
+                      />
+                    </div>
+                    <div className="space-y-4">
+                      <div>
+                        <span className="text-3xl font-bold text-foreground">
+                          ¥{product.price.toLocaleString()}
+                        </span>
+                        <div className="flex items-center space-x-2 mt-2">
+                          <div className="flex">
+                            {[...Array(5)].map((_, i) => (
+                              <Star 
+                                key={i} 
+                                className={`w-4 h-4 ${i < Math.floor(product.rating) ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`} 
+                              />
+                            ))}
+                          </div>
+                          <span className="text-sm text-muted-foreground">
+                            {product.rating} ({product.reviews} reviews)
+                          </span>
+                        </div>
+                      </div>
+                      
+                      <p className="text-muted-foreground">{product.description}</p>
+                      
+                      <div className="space-y-3">
+                        <div>
+                          <label className="text-sm font-medium text-foreground mb-2 block">Size</label>
+                          <Select value={selectedSize} onValueChange={setSelectedSize}>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select size" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {product.sizes.map(size => (
+                                <SelectItem key={size} value={size}>{size}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        
+                        <div>
+                          <label className="text-sm font-medium text-foreground mb-2 block">Color</label>
+                          <Select value={selectedColor} onValueChange={setSelectedColor}>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select color" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {product.colors.map(color => (
+                                <SelectItem key={color} value={color}>{color}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                      
+                      <Button 
+                        onClick={() => {
+                          handleAddToCart();
+                          setIsDetailsOpen(false);
+                        }} 
+                        className="w-full" 
+                        size="lg"
+                      >
+                        <ShoppingCart className="w-4 h-4 mr-2" />
+                        Add to Cart
+                      </Button>
+                    </div>
                   </div>
                   
-                  <div>
-                    <label className="text-sm font-medium text-foreground mb-2 block">Color</label>
-                    <Select value={selectedColor} onValueChange={setSelectedColor}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select color" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {product.colors.map(color => (
-                          <SelectItem key={color} value={color}>{color}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                  <div className="border-t pt-4">
+                    <h3 className="font-semibold text-foreground mb-2">Product Details</h3>
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div>
+                        <span className="text-muted-foreground">Category:</span>
+                        <span className="ml-2 font-medium">{product.category}</span>
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground">Available Sizes:</span>
+                        <span className="ml-2 font-medium">{product.sizes.join(', ')}</span>
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground">Available Colors:</span>
+                        <span className="ml-2 font-medium">{product.colors.join(', ')}</span>
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground">Rating:</span>
+                        <span className="ml-2 font-medium">{product.rating}/5.0</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
-                
-                <div className="flex items-center justify-between">
-                  <span className="text-2xl font-bold text-foreground">
-                    ¥{product.price.toLocaleString()}
-                  </span>
-                  <Button onClick={handleAddToCart} className="px-6">
-                    Add to Cart
-                  </Button>
+              </DialogContent>
+            </Dialog>
+            
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add to Cart
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                  <DialogTitle>{product.name}</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <img
+                    src={product.image}
+                    alt={product.name}
+                    className="w-full h-48 object-cover rounded-lg"
+                  />
+                  <p className="text-sm text-muted-foreground">{product.description}</p>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-sm font-medium text-foreground mb-2 block">Size</label>
+                      <Select value={selectedSize} onValueChange={setSelectedSize}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select size" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {product.sizes.map(size => (
+                            <SelectItem key={size} value={size}>{size}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div>
+                      <label className="text-sm font-medium text-foreground mb-2 block">Color</label>
+                      <Select value={selectedColor} onValueChange={setSelectedColor}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select color" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {product.colors.map(color => (
+                            <SelectItem key={color} value={color}>{color}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <span className="text-2xl font-bold text-foreground">
+                      ¥{product.price.toLocaleString()}
+                    </span>
+                    <Button onClick={handleAddToCart} className="px-6">
+                      Add to Cart
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            </DialogContent>
-          </Dialog>
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
       </CardContent>
     </Card>
