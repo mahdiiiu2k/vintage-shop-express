@@ -88,7 +88,7 @@ export const ProductCard = ({ product, onAddToCart, className }: ProductCardProp
           )}
         </div>
         
-        <div className="p-4">
+        <div className="p-3 sm:p-4">
           <div className="flex items-center justify-between mb-2">
             <h3 className="font-semibold text-lg text-foreground group-hover:text-primary transition-colors">
               {product.name}
@@ -111,13 +111,13 @@ export const ProductCard = ({ product, onAddToCart, className }: ProductCardProp
             </span>
           </div>
 
-          <div className="flex gap-2 w-full">
+          <div className="flex gap-2 w-full min-w-0">
             <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
               <DialogTrigger asChild>
-                <Button variant="outline" className="flex-1 text-xs sm:text-sm px-2 sm:px-3">
-                  <Eye className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 flex-shrink-0" />
-                  <span className="hidden sm:inline whitespace-nowrap">View Details</span>
-                  <span className="sm:hidden">Details</span>
+                <Button variant="outline" className="flex-1 text-xs sm:text-sm px-1 sm:px-3 min-w-0">
+                  <Eye className="w-3 h-3 sm:w-4 sm:h-4 mr-1 flex-shrink-0" />
+                  <span className="hidden md:inline">View Details</span>
+                  <span className="md:hidden">Details</span>
                 </Button>
               </DialogTrigger>
               <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -226,10 +226,10 @@ export const ProductCard = ({ product, onAddToCart, className }: ProductCardProp
             
             <Dialog>
               <DialogTrigger asChild>
-                <Button className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground text-xs sm:text-sm px-2 sm:px-3">
-                  <Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 flex-shrink-0" />
-                  <span className="hidden sm:inline whitespace-nowrap">Add to Cart</span>
-                  <span className="sm:hidden">Add</span>
+                <Button className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground text-xs sm:text-sm px-1 sm:px-3 min-w-0">
+                  <Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-1 flex-shrink-0" />
+                  <span className="hidden md:inline">Add to Cart</span>
+                  <span className="md:hidden">Add</span>
                 </Button>
               </DialogTrigger>
               <DialogContent className="sm:max-w-md">

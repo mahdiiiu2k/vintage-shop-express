@@ -279,9 +279,9 @@ const Shop = () => {
         {/* Products Grid */}
         {loading ? (
           <div className={cn(
-            "grid gap-3 sm:gap-4 md:gap-6",
+            "grid gap-4 md:gap-6",
             viewMode === 'grid' 
-              ? "grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4" 
+              ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" 
               : "grid-cols-1"
           )}>
             {[...Array(8)].map((_, i) => (
@@ -290,9 +290,9 @@ const Shop = () => {
           </div>
         ) : sortedProducts.length > 0 ? (
           <div className={cn(
-            "grid gap-3 sm:gap-4 md:gap-6",
+            "grid gap-4 md:gap-6",
             viewMode === 'grid' 
-              ? "grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4" 
+              ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" 
               : "grid-cols-1"
           )}>
             {sortedProducts.map(product => (
