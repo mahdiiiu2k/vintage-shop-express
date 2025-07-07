@@ -131,7 +131,17 @@ export class MemStorage implements IStorage {
   }
 }
 
-// Use database storage if we have a connection, otherwise use memory storage
-export const storage = process.env.SUPABASE_DATABASE_URL || process.env.DATABASE_URL 
-  ? new DatabaseStorage() 
-  : new MemStorage();
+// Try database storage first, fallback to memory storage if connection fails
+let storage: IStorage;
+try {
+  if (process.env.SUPABASE_DATABASE_URL || process.env.DATABASE_URL) {
+    storage = new DatabaseStorage();
+  } else {
+    storage = new MemStorage();
+  }
+} catch (error) {
+  console.error('Database connection failed, using memory storage:', error);
+  storage = new MemStorage();
+}
+
+export { storage };

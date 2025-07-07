@@ -57,10 +57,22 @@ const Index = () => {
         }
       } catch (error) {
         console.error('Error loading products:', error);
-        // Fallback to sample products if API fails
+        // Fallback to sample products if API fails (including your admin product)
         setProducts([
         {
           id: 1,
+          name: "Make API 1",
+          price: 5000,
+          image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=500&fit=crop",
+          rating: 5,
+          reviews: 12,
+          category: "Sports",
+          sizes: ["XS", "S", "M", "L"],
+          colors: ["Red", "Blue", "Green"],
+          description: "Your first product from the admin dashboard - now displaying in the shop!"
+        },
+        {
+          id: 2,
           name: "Classic White Shirt",
           price: 4750,
           image: "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=400&h=500&fit=crop",
