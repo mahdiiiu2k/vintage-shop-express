@@ -11,6 +11,7 @@ interface NavigationProps {
   cartItemCount?: number;
   searchTerm?: string;
   onSearchChange?: (value: string) => void;
+  showSearch?: boolean;
   className?: string;
 }
 
@@ -18,6 +19,7 @@ export const Navigation = ({
   cartItemCount = 0, 
   searchTerm = '', 
   onSearchChange,
+  showSearch = false,
   className 
 }: NavigationProps) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -65,35 +67,39 @@ export const Navigation = ({
           </div>
 
           <div className="flex items-center space-x-1 sm:space-x-2 md:space-x-4">
-            <div className="relative hidden md:block">
-              <Search className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
-              <Input
-                type="text"
-                placeholder="Search products..."
-                className="pl-10 pr-4 py-2 w-64 bg-background border-border focus:border-primary transition-colors"
-                value={searchTerm}
-                onChange={(e) => onSearchChange?.(e.target.value)}
-              />
-            </div>
+            {showSearch && (
+              <div className="relative hidden md:block">
+                <Search className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  type="text"
+                  placeholder="Search products..."
+                  className="pl-10 pr-4 py-2 w-64 bg-background border-border focus:border-primary transition-colors"
+                  value={searchTerm}
+                  onChange={(e) => onSearchChange?.(e.target.value)}
+                />
+              </div>
+            )}
             
-            {/* Mobile Search Button */}
-            <Button 
-              variant="ghost" 
-              size="icon"
-              className="md:hidden h-10 w-10"
-              onClick={() => {
-                setIsMobileMenuOpen(!isMobileMenuOpen);
-                // Focus search input when menu opens
-                setTimeout(() => {
-                  const searchInput = document.querySelector('input[placeholder="Search products..."]') as HTMLInputElement;
-                  if (searchInput && isMobileMenuOpen === false) {
-                    searchInput.focus();
-                  }
-                }, 100);
-              }}
-            >
-              <Search className="w-5 h-5" />
-            </Button>
+            {/* Mobile Search Button - only show on shop page */}
+            {showSearch && (
+              <Button 
+                variant="ghost" 
+                size="icon"
+                className="md:hidden h-10 w-10"
+                onClick={() => {
+                  setIsMobileMenuOpen(!isMobileMenuOpen);
+                  // Focus search input when menu opens
+                  setTimeout(() => {
+                    const searchInput = document.querySelector('input[placeholder="Search products..."]') as HTMLInputElement;
+                    if (searchInput && isMobileMenuOpen === false) {
+                      searchInput.focus();
+                    }
+                  }, 100);
+                }}
+              >
+                <Search className="w-5 h-5" />
+              </Button>
+            )}
             
             <div className="hidden md:block">
               <ThemeToggle />
@@ -132,17 +138,19 @@ export const Navigation = ({
       {isMobileMenuOpen && (
         <div className="md:hidden bg-background border-t border-border animate-in slide-in-from-top-2 duration-300">
           <div className="px-4 py-4 space-y-4">
-            {/* Mobile Search */}
-            <div className="relative">
-              <Search className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
-              <Input
-                type="text"
-                placeholder="Search products..."
-                className="w-full pl-10 pr-4 py-3 h-12 text-base bg-background border-border"
-                value={searchTerm}
-                onChange={(e) => onSearchChange?.(e.target.value)}
-              />
-            </div>
+            {/* Mobile Search - only show on shop page */}
+            {showSearch && (
+              <div className="relative">
+                <Search className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  type="text"
+                  placeholder="Search products..."
+                  className="w-full pl-10 pr-4 py-3 h-12 text-base bg-background border-border"
+                  value={searchTerm}
+                  onChange={(e) => onSearchChange?.(e.target.value)}
+                />
+              </div>
+            )}
             
             {/* Mobile Navigation Links */}
             <div className="flex flex-col space-y-1">

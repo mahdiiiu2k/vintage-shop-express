@@ -26,7 +26,7 @@ interface Product {
 const Index = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
+
   const { addToCart, getTotalItems } = useCart();
   const { toast } = useToast();
 
@@ -116,10 +116,6 @@ const Index = () => {
     loadProducts();
   }, []);
 
-  const filteredProducts = products.filter(product =>
-    product.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
   const featuredProducts = products.slice(0, 3);
 
   return (
@@ -127,8 +123,6 @@ const Index = () => {
       {/* Navigation */}
       <Navigation 
         cartItemCount={getTotalItems()}
-        searchTerm={searchTerm}
-        onSearchChange={setSearchTerm}
       />
 
       {/* Hero Section */}

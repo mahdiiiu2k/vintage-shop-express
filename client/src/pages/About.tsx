@@ -5,15 +5,13 @@ import { Navigation } from '@/components/Navigation';
 import { useCart } from '@/hooks/useCart';
 
 const About = () => {
-  const [searchTerm, setSearchTerm] = useState('');
+
   const { getTotalItems } = useCart();
 
   return (
     <div className="min-h-screen bg-background">
       <Navigation 
         cartItemCount={getTotalItems()}
-        searchTerm={searchTerm}
-        onSearchChange={setSearchTerm}
       />
 
       {/* About Hero */}

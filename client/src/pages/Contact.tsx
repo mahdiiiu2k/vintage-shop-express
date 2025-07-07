@@ -10,7 +10,7 @@ import { useCart } from '@/hooks/useCart';
 import { useToast } from '@/hooks/use-toast';
 
 const Contact = () => {
-  const [searchTerm, setSearchTerm] = useState('');
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -49,8 +49,6 @@ const Contact = () => {
     <div className="min-h-screen bg-background">
       <Navigation 
         cartItemCount={getTotalItems()}
-        searchTerm={searchTerm}
-        onSearchChange={setSearchTerm}
       />
 
       {/* Contact Hero */}
