@@ -13,14 +13,15 @@ import { useToast } from '@/hooks/use-toast';
 interface Product {
   id: number;
   name: string;
-  price: number;
-  image: string;
-  rating: number;
-  reviews: number;
+  price: string;
+  image_url: string;
+  description: string;
   category: string;
   sizes: string[];
   colors: string[];
-  description: string;
+  stock_quantity: number;
+  created_at: string;
+  updated_at: string;
 }
 
 const Index = () => {
@@ -38,20 +39,8 @@ const Index = () => {
         const response = await fetch('/api/products');
         if (response.ok) {
           const data = await response.json();
-          // Convert database products to frontend format and take only first 6 for homepage
-          const formattedProducts = data.slice(0, 6).map((product: any) => ({
-            id: product.id,
-            name: product.name,
-            price: parseFloat(product.price),
-            image: product.image_url || "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=400&h=500&fit=crop",
-            rating: 5,
-            reviews: 12,
-            category: product.category || "General",
-            sizes: product.sizes || ["S", "M", "L", "XL"],
-            colors: product.colors || ["White", "Black", "Blue"],
-            description: product.description || "Premium quality product."
-          }));
-          setProducts(formattedProducts);
+          // Take only first 6 products for homepage
+          setProducts(data.slice(0, 6));
         } else {
           throw new Error('Failed to fetch products');
         }

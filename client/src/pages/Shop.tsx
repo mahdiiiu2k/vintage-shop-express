@@ -13,14 +13,15 @@ import { cn } from '@/lib/utils';
 interface Product {
   id: number;
   name: string;
-  price: number;
-  image: string;
-  rating: number;
-  reviews: number;
+  price: string;
+  image_url: string;
+  description: string;
   category: string;
   sizes: string[];
   colors: string[];
-  description: string;
+  stock_quantity: number;
+  created_at: string;
+  updated_at: string;
 }
 
 const Shop = () => {
@@ -40,22 +41,10 @@ const Shop = () => {
       const response = await fetch('/api/products?t=' + Date.now());
       if (response.ok) {
         const data = await response.json();
-        const formattedProducts = data.map((product: any) => ({
-          id: product.id,
-          name: product.name,
-          price: parseFloat(product.price),
-          image: product.image_url || "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=400&h=500&fit=crop",
-          rating: 5,
-          reviews: 12,
-          category: product.category || "General",
-          sizes: product.sizes || ["S", "M", "L", "XL"],
-          colors: product.colors || ["White", "Black", "Blue"],
-          description: product.description || "Premium quality product."
-        }));
-        setProducts(formattedProducts);
+        setProducts(data);
         toast({
           title: "Products refreshed!",
-          description: `Loaded ${formattedProducts.length} products from database.`,
+          description: `Loaded ${data.length} products from database.`,
         });
       } else {
         throw new Error('Failed to fetch products');
@@ -79,20 +68,7 @@ const Shop = () => {
         const response = await fetch('/api/products');
         if (response.ok) {
           const data = await response.json();
-          // Convert database products to frontend format
-          const formattedProducts = data.map((product: any) => ({
-            id: product.id,
-            name: product.name,
-            price: parseFloat(product.price),
-            image: product.image_url || "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=400&h=500&fit=crop",
-            rating: 5, // Default rating
-            reviews: 12, // Default reviews
-            category: product.category || "General",
-            sizes: product.sizes || ["S", "M", "L", "XL"],
-            colors: product.colors || ["White", "Black", "Blue"],
-            description: product.description || "Premium quality product."
-          }));
-          setProducts(formattedProducts);
+          setProducts(data);
         } else {
           throw new Error('Failed to fetch products');
         }

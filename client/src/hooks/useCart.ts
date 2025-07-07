@@ -3,14 +3,15 @@ import { useState, useEffect } from 'react';
 interface Product {
   id: number;
   name: string;
-  price: number;
-  image: string;
-  rating: number;
-  reviews: number;
+  price: string;
+  image_url: string;
+  description: string;
   category: string;
   sizes: string[];
   colors: string[];
-  description: string;
+  stock_quantity: number;
+  created_at: string;
+  updated_at: string;
 }
 
 interface CartItem {

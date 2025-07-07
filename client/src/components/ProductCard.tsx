@@ -11,14 +11,15 @@ import { cn } from '@/lib/utils';
 interface Product {
   id: number;
   name: string;
-  price: number;
-  image: string;
-  rating: number;
-  reviews: number;
+  price: string;
+  image_url: string;
+  description: string;
   category: string;
   sizes: string[];
   colors: string[];
-  description: string;
+  stock_quantity: number;
+  created_at: string;
+  updated_at: string;
 }
 
 interface ProductCardProps {
@@ -71,7 +72,7 @@ export const ProductCard = ({ product, onAddToCart, className }: ProductCardProp
       <CardContent className="p-0">
         <div className="relative overflow-hidden">
           <img
-            src={product.image}
+            src={product.image_url || "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=400&h=500&fit=crop"}
             alt={product.name}
             className="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-105"
           />
@@ -100,7 +101,7 @@ export const ProductCard = ({ product, onAddToCart, className }: ProductCardProp
             <div className="flex items-center space-x-1">
               <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
               <span className="text-sm text-muted-foreground">
-                {product.rating} ({product.reviews})
+                5.0 (12)
               </span>
             </div>
           </div>
@@ -111,7 +112,7 @@ export const ProductCard = ({ product, onAddToCart, className }: ProductCardProp
           
           <div className="flex items-center justify-between mb-4">
             <span className="text-2xl font-bold text-foreground">
-              ¥{product.price.toLocaleString()}
+              ${parseFloat(product.price).toFixed(2)}
             </span>
           </div>
 
