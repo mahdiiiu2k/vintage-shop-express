@@ -32,6 +32,7 @@ export const ProductCard = ({ product, onAddToCart, className }: ProductCardProp
   const [selectedColor, setSelectedColor] = useState('');
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [isAddToCartOpen, setIsAddToCartOpen] = useState(false);
   const { toast } = useToast();
 
   const handleAddToCart = () => {
@@ -49,6 +50,9 @@ export const ProductCard = ({ product, onAddToCart, className }: ProductCardProp
       title: "Added to cart!",
       description: `${product.name} has been added to your cart.`,
     });
+    
+    // Close the modal after successful add to cart
+    setIsAddToCartOpen(false);
   };
 
   const toggleWishlist = () => {
@@ -224,7 +228,7 @@ export const ProductCard = ({ product, onAddToCart, className }: ProductCardProp
               </DialogContent>
             </Dialog>
             
-            <Dialog>
+            <Dialog open={isAddToCartOpen} onOpenChange={setIsAddToCartOpen}>
               <DialogTrigger asChild>
                 <Button className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground text-xs sm:text-sm px-1 sm:px-3 min-w-0">
                   <Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-1 flex-shrink-0" />
