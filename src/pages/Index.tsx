@@ -1,11 +1,14 @@
 
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ShoppingCart, Star, Search, Menu, X } from 'lucide-react';
+import { ShoppingCart, Star, Search, Menu, X, Plus, Minus, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { useToast } from '@/hooks/use-toast';
 
 interface Product {
   id: number;
@@ -17,6 +20,15 @@ interface Product {
   category: string;
   sizes: string[];
   colors: string[];
+  description: string;
+}
+
+interface CartItem {
+  id: number;
+  product: Product;
+  quantity: number;
+  selectedSize: string;
+  selectedColor: string;
 }
 
 const Index = () => {
@@ -30,7 +42,8 @@ const Index = () => {
       reviews: 12,
       category: "Shirts",
       sizes: ["S", "M", "L", "XL"],
-      colors: ["White", "Black", "Blue"]
+      colors: ["White", "Black", "Blue"],
+      description: "Premium cotton shirt perfect for any occasion. Comfortable fit and elegant design."
     },
     {
       id: 2,
@@ -41,7 +54,8 @@ const Index = () => {
       reviews: 8,
       category: "Jackets",
       sizes: ["S", "M", "L", "XL"],
-      colors: ["Blue", "Black"]
+      colors: ["Blue", "Black"],
+      description: "Classic denim jacket with vintage styling. Durable and timeless design."
     },
     {
       id: 3,
@@ -52,7 +66,8 @@ const Index = () => {
       reviews: 15,
       category: "Dresses",
       sizes: ["XS", "S", "M", "L"],
-      colors: ["Black", "Navy", "Burgundy"]
+      colors: ["Black", "Navy", "Burgundy"],
+      description: "Sophisticated black dress suitable for formal events and special occasions."
     },
     {
       id: 4,
@@ -63,7 +78,8 @@ const Index = () => {
       reviews: 23,
       category: "T-Shirts",
       sizes: ["S", "M", "L", "XL", "XXL"],
-      colors: ["White", "Black", "Gray", "Navy"]
+      colors: ["White", "Black", "Gray", "Navy"],
+      description: "Comfortable cotton t-shirt for everyday wear. Soft fabric and relaxed fit."
     },
     {
       id: 5,
@@ -74,7 +90,8 @@ const Index = () => {
       reviews: 7,
       category: "Dresses",
       sizes: ["XS", "S", "M", "L"],
-      colors: ["Floral", "White"]
+      colors: ["Floral", "White"],
+      description: "Beautiful floral dress perfect for summer occasions. Light and airy fabric."
     },
     {
       id: 6,
@@ -85,14 +102,18 @@ const Index = () => {
       reviews: 11,
       category: "Sweaters",
       sizes: ["S", "M", "L", "XL"],
-      colors: ["Beige", "Gray", "Navy"]
+      colors: ["Beige", "Gray", "Navy"],
+      description: "Luxurious wool sweater for cold weather. Warm and stylish design."
     }
   ]);
 
-  const [cartItems, setCartItems] = useState<number[]>([]);
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [email, setEmail] = useState('');
+  const { toast } = useToast();
 
   const categories = ['All', 'Shirts', 'Jackets', 'Dresses', 'T-Shirts', 'Sweaters'];
 
@@ -102,8 +123,64 @@ const Index = () => {
     return matchesSearch && matchesCategory;
   });
 
-  const addToCart = (productId: number) => {
-    setCartItems([...cartItems, productId]);
+  const addToCart = (product: Product, size: string, color: string) => {
+    const existingItem = cartItems.find(
+      item => item.product.id === product.id && item.selectedSize === size && item.selectedColor === color
+    );
+
+    if (existingItem) {
+      setCartItems(cartItems.map(item =>
+        item.id === existingItem.id
+          ? { ...item, quantity: item.quantity + 1 }
+          : item
+      ));
+    } else {
+      const newItem: CartItem = {
+        id: Date.now(),
+        product,
+        quantity: 1,
+        selectedSize: size,
+        selectedColor: color
+      };
+      setCartItems([...cartItems, newItem]);
+    }
+
+    toast({
+      title: "Added to Cart",
+      description: `${product.name} has been added to your cart.`,
+    });
+  };
+
+  const updateQuantity = (itemId: number, newQuantity: number) => {
+    if (newQuantity === 0) {
+      removeFromCart(itemId);
+      return;
+    }
+    setCartItems(cartItems.map(item =>
+      item.id === itemId ? { ...item, quantity: newQuantity } : item
+    ));
+  };
+
+  const removeFromCart = (itemId: number) => {
+    setCartItems(cartItems.filter(item => item.id !== itemId));
+    toast({
+      title: "Removed from Cart",
+      description: "Item has been removed from your cart.",
+    });
+  };
+
+  const getTotalPrice = () => {
+    return cartItems.reduce((total, item) => total + (item.product.price * item.quantity), 0);
+  };
+
+  const handleSubscribe = () => {
+    if (email) {
+      toast({
+        title: "Subscribed!",
+        description: "Thank you for subscribing to our newsletter.",
+      });
+      setEmail('');
+    }
   };
 
   const formatPrice = (price: number) => {
@@ -117,6 +194,75 @@ const Index = () => {
         className={`w-4 h-4 ${i < rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`}
       />
     ));
+  };
+
+  const ProductCard = ({ product }: { product: Product }) => {
+    const [selectedSize, setSelectedSize] = useState(product.sizes[0]);
+    const [selectedColor, setSelectedColor] = useState(product.colors[0]);
+
+    return (
+      <Card className="group hover:shadow-xl transition-all duration-300 border-0 shadow-lg">
+        <div className="relative overflow-hidden rounded-t-lg">
+          <img
+            src={product.image}
+            alt={product.name}
+            className="w-full h-80 object-cover group-hover:scale-105 transition-transform duration-300"
+          />
+          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-300" />
+        </div>
+        <CardContent className="p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">{product.name}</h3>
+          <p className="text-sm text-gray-600 mb-3">{product.description}</p>
+          <div className="flex items-center mb-3">
+            <div className="flex items-center mr-2">
+              {renderStars(product.rating)}
+            </div>
+            <span className="text-sm text-gray-500">({product.reviews} reviews)</span>
+          </div>
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-2xl font-bold text-gray-900">{formatPrice(product.price)}</span>
+            <Badge variant="secondary">{product.category}</Badge>
+          </div>
+          
+          <div className="space-y-3 mb-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Size</label>
+              <Select value={selectedSize} onValueChange={setSelectedSize}>
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {product.sizes.map((size) => (
+                    <SelectItem key={size} value={size}>{size}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Color</label>
+              <Select value={selectedColor} onValueChange={setSelectedColor}>
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {product.colors.map((color) => (
+                    <SelectItem key={color} value={color}>{color}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          
+          <Button
+            onClick={() => addToCart(product, selectedSize, selectedColor)}
+            className="w-full bg-black text-white hover:bg-gray-800 transition-colors"
+          >
+            Add to Cart
+          </Button>
+        </CardContent>
+      </Card>
+    );
   };
 
   return (
@@ -137,7 +283,6 @@ const Index = () => {
               <Link to="/shop" className="text-gray-900 hover:text-gray-600 transition">Shop</Link>
               <Link to="/about" className="text-gray-900 hover:text-gray-600 transition">About</Link>
               <Link to="/contact" className="text-gray-900 hover:text-gray-600 transition">Contact</Link>
-              <Link to="/admin" className="text-gray-900 hover:text-gray-600 transition">Admin</Link>
             </div>
 
             <div className="flex items-center space-x-4">
@@ -151,14 +296,82 @@ const Index = () => {
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
-              <Button variant="outline" className="relative">
-                <ShoppingCart className="w-5 h-5" />
-                {cartItems.length > 0 && (
-                  <Badge className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
-                    {cartItems.length}
-                  </Badge>
-                )}
-              </Button>
+              
+              <Dialog open={isCartOpen} onOpenChange={setIsCartOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="outline" className="relative">
+                    <ShoppingCart className="w-5 h-5" />
+                    {cartItems.length > 0 && (
+                      <Badge className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
+                        {cartItems.reduce((total, item) => total + item.quantity, 0)}
+                      </Badge>
+                    )}
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>Shopping Cart</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    {cartItems.length === 0 ? (
+                      <p className="text-center text-gray-500 py-8">Your cart is empty</p>
+                    ) : (
+                      <>
+                        {cartItems.map((item) => (
+                          <div key={item.id} className="flex items-center space-x-4 p-4 border rounded-lg">
+                            <img
+                              src={item.product.image}
+                              alt={item.product.name}
+                              className="w-16 h-16 object-cover rounded"
+                            />
+                            <div className="flex-1">
+                              <h4 className="font-semibold">{item.product.name}</h4>
+                              <p className="text-sm text-gray-600">
+                                Size: {item.selectedSize}, Color: {item.selectedColor}
+                              </p>
+                              <p className="font-bold">{formatPrice(item.product.price)}</p>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                              >
+                                <Minus className="w-4 h-4" />
+                              </Button>
+                              <span className="w-8 text-center">{item.quantity}</span>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                              >
+                                <Plus className="w-4 h-4" />
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => removeFromCart(item.id)}
+                                className="text-red-600"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
+                        <div className="border-t pt-4">
+                          <div className="flex justify-between items-center mb-4">
+                            <span className="text-xl font-bold">Total: {formatPrice(getTotalPrice())}</span>
+                          </div>
+                          <Button className="w-full bg-black text-white hover:bg-gray-800">
+                            Proceed to Checkout
+                          </Button>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </DialogContent>
+              </Dialog>
+              
               <Button
                 variant="ghost"
                 className="md:hidden"
@@ -186,7 +399,6 @@ const Index = () => {
                 <Link to="/shop" className="block px-3 py-2 text-gray-900 hover:bg-gray-50">Shop</Link>
                 <Link to="/about" className="block px-3 py-2 text-gray-900 hover:bg-gray-50">About</Link>
                 <Link to="/contact" className="block px-3 py-2 text-gray-900 hover:bg-gray-50">Contact</Link>
-                <Link to="/admin" className="block px-3 py-2 text-gray-900 hover:bg-gray-50">Admin</Link>
               </div>
             </div>
           </div>
@@ -203,7 +415,11 @@ const Index = () => {
             Curated collection of premium clothing for the modern wardrobe. 
             Quality pieces that define your unique aesthetic.
           </p>
-          <Button size="lg" className="bg-black text-white hover:bg-gray-800 px-8 py-3">
+          <Button 
+            size="lg" 
+            className="bg-black text-white hover:bg-gray-800 px-8 py-3"
+            onClick={() => document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' })}
+          >
             Shop Now
           </Button>
         </div>
@@ -228,39 +444,11 @@ const Index = () => {
       </section>
 
       {/* Products Grid */}
-      <section className="py-16">
+      <section id="products" className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
             {filteredProducts.map((product) => (
-              <Card key={product.id} className="group hover:shadow-xl transition-all duration-300 border-0 shadow-lg">
-                <div className="relative overflow-hidden rounded-t-lg">
-                  <img
-                    src={product.image}
-                    alt={product.name}
-                    className="w-full h-80 object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-300" />
-                </div>
-                <CardContent className="p-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">{product.name}</h3>
-                  <div className="flex items-center mb-3">
-                    <div className="flex items-center mr-2">
-                      {renderStars(product.rating)}
-                    </div>
-                    <span className="text-sm text-gray-500">({product.reviews} reviews)</span>
-                  </div>
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="text-2xl font-bold text-gray-900">{formatPrice(product.price)}</span>
-                    <Badge variant="secondary">{product.category}</Badge>
-                  </div>
-                  <Button
-                    onClick={() => addToCart(product.id)}
-                    className="w-full bg-black text-white hover:bg-gray-800 transition-colors"
-                  >
-                    Add to Cart
-                  </Button>
-                </CardContent>
-              </Card>
+              <ProductCard key={product.id} product={product} />
             ))}
           </div>
         </div>
@@ -278,8 +466,13 @@ const Index = () => {
               type="email"
               placeholder="Enter your email"
               className="flex-1"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
-            <Button className="bg-black text-white hover:bg-gray-800">
+            <Button 
+              className="bg-black text-white hover:bg-gray-800"
+              onClick={handleSubscribe}
+            >
               Subscribe
             </Button>
           </div>
@@ -308,10 +501,10 @@ const Index = () => {
             <div>
               <h4 className="font-semibold mb-4">Categories</h4>
               <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white transition">Shirts</a></li>
-                <li><a href="#" className="hover:text-white transition">Dresses</a></li>
-                <li><a href="#" className="hover:text-white transition">Jackets</a></li>
-                <li><a href="#" className="hover:text-white transition">Accessories</a></li>
+                <li><button onClick={() => setSelectedCategory('Shirts')} className="hover:text-white transition">Shirts</button></li>
+                <li><button onClick={() => setSelectedCategory('Dresses')} className="hover:text-white transition">Dresses</button></li>
+                <li><button onClick={() => setSelectedCategory('Jackets')} className="hover:text-white transition">Jackets</button></li>
+                <li><button onClick={() => setSelectedCategory('T-Shirts')} className="hover:text-white transition">T-Shirts</button></li>
               </ul>
             </div>
             <div>
