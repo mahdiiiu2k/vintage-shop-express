@@ -30,13 +30,35 @@ const Index = () => {
   const { addToCart, getTotalItems } = useCart();
   const { toast } = useToast();
 
-  // Simulate loading products
+  // Load products from API
   useEffect(() => {
     const loadProducts = async () => {
       setLoading(true);
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      setProducts([
+      try {
+        const response = await fetch('/api/products');
+        if (response.ok) {
+          const data = await response.json();
+          // Convert database products to frontend format and take only first 6 for homepage
+          const formattedProducts = data.slice(0, 6).map((product: any) => ({
+            id: product.id,
+            name: product.name,
+            price: parseFloat(product.price),
+            image: product.image_url || "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=400&h=500&fit=crop",
+            rating: 5,
+            reviews: 12,
+            category: product.category || "General",
+            sizes: product.sizes || ["S", "M", "L", "XL"],
+            colors: product.colors || ["White", "Black", "Blue"],
+            description: product.description || "Premium quality product."
+          }));
+          setProducts(formattedProducts);
+        } else {
+          throw new Error('Failed to fetch products');
+        }
+      } catch (error) {
+        console.error('Error loading products:', error);
+        // Fallback to sample products if API fails
+        setProducts([
         {
           id: 1,
           name: "Classic White Shirt",
@@ -110,6 +132,7 @@ const Index = () => {
           description: "Luxurious wool sweater for cold weather. Warm and stylish design."
         }
       ]);
+      }
       setLoading(false);
     };
 

@@ -34,12 +34,35 @@ const Shop = () => {
   const { addToCart, getTotalItems } = useCart();
   const { toast } = useToast();
 
-  // Simulate loading products
+  // Load products from API
   useEffect(() => {
     const loadProducts = async () => {
       setLoading(true);
-      await new Promise(resolve => setTimeout(resolve, 800));
-      setProducts([
+      try {
+        const response = await fetch('/api/products');
+        if (response.ok) {
+          const data = await response.json();
+          // Convert database products to frontend format
+          const formattedProducts = data.map((product: any) => ({
+            id: product.id,
+            name: product.name,
+            price: parseFloat(product.price),
+            image: product.image_url || "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=400&h=500&fit=crop",
+            rating: 5, // Default rating
+            reviews: 12, // Default reviews
+            category: product.category || "General",
+            sizes: product.sizes || ["S", "M", "L", "XL"],
+            colors: product.colors || ["White", "Black", "Blue"],
+            description: product.description || "Premium quality product."
+          }));
+          setProducts(formattedProducts);
+        } else {
+          throw new Error('Failed to fetch products');
+        }
+      } catch (error) {
+        console.error('Error loading products:', error);
+        // Fallback to sample products if API fails
+        setProducts([
         {
           id: 1,
           name: "Classic White Shirt",
@@ -137,6 +160,7 @@ const Shop = () => {
           description: "Handcrafted leather bag with adjustable strap. Perfect for daily use."
         }
       ]);
+      }
       setLoading(false);
     };
 
