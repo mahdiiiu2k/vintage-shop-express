@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Complete Integration</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .test-section { margin: 20px 0; padding: 20px; border: 1px solid #ddd; }
+        .success { color: green; }
+        .error { color: red; }
+        .result { margin: 10px 0; padding: 10px; background: #f5f5f5; }
+        img { max-width: 200px; margin: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Complete Integration Test</h1>
+        
+        <div class="test-section">
+            <h2>1. Test Image Upload to Supabase Storage</h2>
+            <input type="file" id="testImage" accept="image/*">
+            <button onclick="testImageUpload()">Upload Test Image</button>
+            <div id="uploadResult" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>2. Test Product Creation with Image</h2>
+            <input type="text" id="productName" placeholder="Product Name" value="Test Product">
+            <input type="number" id="productPrice" placeholder="Price" value="29.99">
+            <textarea id="productDescription" placeholder="Description">Test product created via integration test</textarea>
+            <button onclick="createProductWithImage()">Create Product with Image</button>
+            <div id="productResult" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>3. Test E-shop Display</h2>
+            <button onclick="testEshopDisplay()">Fetch Products from E-shop</button>
+            <div id="eshopResult" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>4. Test Supabase Storage Status</h2>
+            <button onclick="testSupabaseStatus()">Check Supabase Status</button>
+            <div id="supabaseResult" class="result"></div>
+        </div>
+    </div>
+
+    <script>
+        let uploadedImageUrl = '';
+
+        async function testImageUpload() {
+            const fileInput = document.getElementById('testImage');
+            const resultDiv = document.getElementById('uploadResult');
+            
+            if (!fileInput.files[0]) {
+                resultDiv.innerHTML = '<span class="error">Please select an image file</span>';
+                return;
+            }
+
+            const file = fileInput.files[0];
+            
+            try {
+                // Convert to base64
+                const base64 = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(file);
+                });
+
+                // Upload via API
+                const response = await fetch('/api/sync-image', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        filename: file.name,
+                        imageData: base64,
+                        productId: 'test'
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    uploadedImageUrl = result.publicUrl;
+                    resultDiv.innerHTML = `
+                        <span class="success">✓ Image uploaded successfully!</span><br>
+                        <strong>Public URL:</strong> <a href="${result.publicUrl}" target="_blank">${result.publicUrl}</a><br>
+                        <img src="${result.publicUrl}" alt="Uploaded image">
+                    `;
+                } else {
+                    resultDiv.innerHTML = `<span class="error">❌ Upload failed: ${result.error}</span>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<span class="error">❌ Upload failed: ${error.message}</span>`;
+            }
+        }
+
+        async function createProductWithImage() {
+            const resultDiv = document.getElementById('productResult');
+            
+            if (!uploadedImageUrl) {
+                resultDiv.innerHTML = '<span class="error">Please upload an image first</span>';
+                return;
+            }
+
+            const productData = {
+                name: document.getElementById('productName').value,
+                price: document.getElementById('productPrice').value,
+                description: document.getElementById('productDescription').value,
+                image_url: uploadedImageUrl,
+                category: 'Test Category',
+                sizes: ['S', 'M', 'L'],
+                colors: ['Blue', 'Red'],
+                stock_quantity: 10
+            };
+
+            try {
+                const response = await fetch('/api/products', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(productData)
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `
+                        <span class="success">✓ Product created successfully!</span><br>
+                        <strong>Product ID:</strong> ${result.id}<br>
+                        <strong>Name:</strong> ${result.name}<br>
+                        <strong>Price:</strong> $${result.price}<br>
+                        <strong>Image URL:</strong> <a href="${result.image_url}" target="_blank">${result.image_url}</a><br>
+                        <img src="${result.image_url}" alt="${result.name}">
+                    `;
+                } else {
+                    resultDiv.innerHTML = `<span class="error">❌ Product creation failed: ${result.error}</span>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<span class="error">❌ Product creation failed: ${error.message}</span>`;
+            }
+        }
+
+        async function testEshopDisplay() {
+            const resultDiv = document.getElementById('eshopResult');
+            
+            try {
+                const response = await fetch('/api/products');
+                const products = await response.json();
+                
+                if (response.ok) {
+                    let html = `<span class="success">✓ Successfully fetched ${products.length} products from e-shop</span><br><br>`;
+                    
+                    products.forEach(product => {
+                        html += `
+                            <div style="border: 1px solid #ccc; padding: 10px; margin: 10px 0;">
+                                <strong>${product.name}</strong> - $${product.price}<br>
+                                ${product.description || 'No description'}<br>
+                                ${product.image_url ? `<img src="${product.image_url}" alt="${product.name}">` : 'No image'}
+                            </div>
+                        `;
+                    });
+                    
+                    resultDiv.innerHTML = html;
+                } else {
+                    resultDiv.innerHTML = `<span class="error">❌ Failed to fetch products: ${products.error}</span>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<span class="error">❌ Failed to fetch products: ${error.message}</span>`;
+            }
+        }
+
+        async function testSupabaseStatus() {
+            const resultDiv = document.getElementById('supabaseResult');
+            
+            try {
+                const response = await fetch('/api/test-supabase');
+                const result = await response.json();
+                
+                if (result.success) {
+                    let html = `<span class="success">✓ Supabase Storage connected successfully!</span><br>`;
+                    html += `<strong>Available buckets:</strong><br>`;
+                    result.buckets.forEach(bucket => {
+                        html += `- ${bucket.name} (${bucket.public ? 'Public' : 'Private'})<br>`;
+                    });
+                    resultDiv.innerHTML = html;
+                } else {
+                    resultDiv.innerHTML = `<span class="error">❌ Supabase connection failed: ${result.error}</span>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<span class="error">❌ Supabase test failed: ${error.message}</span>`;
+            }
+        }
+
+        // Auto-run Supabase status check on page load
+        window.onload = function() {
+            testSupabaseStatus();
+        };
+    </script>
+</body>
+</html>
