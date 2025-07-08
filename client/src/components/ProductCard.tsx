@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Star, Plus, Heart, Eye, ShoppingCart } from 'lucide-react';
+import { Plus, Eye, ShoppingCart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -31,7 +31,6 @@ interface ProductCardProps {
 export const ProductCard = ({ product, onAddToCart, className }: ProductCardProps) => {
   const [selectedSize, setSelectedSize] = useState('');
   const [selectedColor, setSelectedColor] = useState('');
-  const [isWishlisted, setIsWishlisted] = useState(false);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [isAddToCartOpen, setIsAddToCartOpen] = useState(false);
   const { toast } = useToast();
@@ -56,13 +55,7 @@ export const ProductCard = ({ product, onAddToCart, className }: ProductCardProp
     setIsAddToCartOpen(false);
   };
 
-  const toggleWishlist = () => {
-    setIsWishlisted(!isWishlisted);
-    toast({
-      title: isWishlisted ? "Removed from wishlist" : "Added to wishlist",
-      description: `${product.name} ${isWishlisted ? 'removed from' : 'added to'} your wishlist.`,
-    });
-  };
+
 
   return (
     <Card className={cn(
@@ -82,16 +75,7 @@ export const ProductCard = ({ product, onAddToCart, className }: ProductCardProp
             alt={product.name}
             className="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-105"
           />
-          <div className="absolute top-3 right-3 flex flex-col gap-2">
-            <Button
-              variant="secondary"
-              size="icon"
-              className="h-8 w-8 rounded-full bg-background/80 backdrop-blur-sm"
-              onClick={toggleWishlist}
-            >
-              <Heart className={cn("w-4 h-4 transition-colors", isWishlisted && "fill-red-500 text-red-500")} />
-            </Button>
-          </div>
+
           {product.category && (
             <Badge className="absolute top-3 left-3 bg-background/80 backdrop-blur-sm text-foreground">
               {product.category}
