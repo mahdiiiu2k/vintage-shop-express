@@ -234,15 +234,15 @@ export const ProductCard = ({ product, onAddToCart, className }: ProductCardProp
             >
               <Zap className="w-3 h-3 sm:w-4 sm:h-4 mr-1 flex-shrink-0" />
               <span className="hidden lg:inline">Quick Order</span>
-              <span className="lg:hidden">Quick</span>
+              <span className="lg:hidden">Order</span>
             </Button>
             
             <Dialog open={isAddToCartOpen} onOpenChange={setIsAddToCartOpen}>
               <DialogTrigger asChild>
                 <Button className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground text-xs sm:text-sm px-1 sm:px-3 min-w-0">
-                  <Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-1 flex-shrink-0" />
+                  <ShoppingCart className="w-3 h-3 sm:w-4 sm:h-4 mr-1 flex-shrink-0" />
                   <span className="hidden lg:inline">Add to Cart</span>
-                  <span className="lg:hidden">Add</span>
+                  <span className="lg:hidden">+</span>
                 </Button>
               </DialogTrigger>
               <DialogContent className="sm:max-w-md">
