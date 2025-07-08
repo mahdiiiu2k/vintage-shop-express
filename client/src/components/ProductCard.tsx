@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Plus, Eye, ShoppingCart, Package } from 'lucide-react';
+import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -35,6 +36,7 @@ export const ProductCard = ({ product, onAddToCart, className }: ProductCardProp
   const [isAddToCartOpen, setIsAddToCartOpen] = useState(false);
   const [isQuickOrderOpen, setIsQuickOrderOpen] = useState(false);
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
 
   const handleAddToCart = () => {
     if (!selectedSize || !selectedColor) {
@@ -70,11 +72,9 @@ export const ProductCard = ({ product, onAddToCart, className }: ProductCardProp
       return;
     }
 
+    // Add to cart and redirect to checkout
     onAddToCart(product, defaultSize, defaultColor);
-    toast({
-      title: "Quick order successful!",
-      description: `${product.name} (${defaultSize}, ${defaultColor}) added to cart instantly.`,
-    });
+    setLocation('/checkout');
   };
 
 
