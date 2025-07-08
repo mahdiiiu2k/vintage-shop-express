@@ -153,7 +153,7 @@ const Cart = () => {
                 <CardContent className="p-6">
                   <div className="space-y-3">
                     <Button 
-                      className="w-full py-3 text-base bg-green-600 hover:bg-green-700 text-white"
+                      className="w-full py-3 text-base bg-green-700 hover:bg-green-800 text-white"
                       onClick={handleCheckout}
                       disabled={isProcessing}
                     >
