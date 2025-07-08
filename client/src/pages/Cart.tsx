@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'wouter';
+import { Link, useLocation } from 'wouter';
 import { Plus, Minus, Trash2, ArrowLeft, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,9 +11,10 @@ import { useToast } from '@/hooks/use-toast';
 const Cart = () => {
   const { cartItems, removeFromCart, updateQuantity, getTotalItems, getTotalPrice, clearCart } = useCart();
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const handleCheckout = async () => {
+  const handleCheckout = () => {
     if (cartItems.length === 0) {
       toast({
         title: "Cart is empty",
@@ -23,29 +24,8 @@ const Cart = () => {
       return;
     }
 
-    setIsProcessing(true);
-    
-    try {
-      // Simulate processing
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      toast({
-        title: "Order placed successfully!",
-        description: `Your order for ¥${getTotalPrice().toLocaleString()} has been placed.`,
-      });
-      
-      // Clear cart after successful order
-      clearCart();
-      
-    } catch (error) {
-      toast({
-        title: "Checkout failed",
-        description: "Please try again later.",
-        variant: "destructive"
-      });
-    } finally {
-      setIsProcessing(false);
-    }
+    // Redirect to checkout page
+    setLocation('/checkout');
   };
 
   return (
@@ -155,19 +135,11 @@ const Cart = () => {
                     <Button 
                       className="w-full py-3 text-base bg-green-700 hover:bg-green-800 text-white"
                       onClick={handleCheckout}
-                      disabled={isProcessing}
                     >
-                      {isProcessing ? (
-                        <div className="flex items-center gap-2">
-                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                          Processing...
-                        </div>
-                      ) : (
-                        <div className="flex items-center gap-2">
-                          <CheckCircle className="w-4 h-4" />
-                          Confirm Order
-                        </div>
-                      )}
+                      <div className="flex items-center gap-2">
+                        <CheckCircle className="w-4 h-4" />
+                        Confirm Order
+                      </div>
                     </Button>
                     
                     <Link href="/shop" className="block">
