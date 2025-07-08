@@ -136,6 +136,14 @@ Changelog:
   * Implemented fallback image handling for missing images
   * Added image proxy endpoint for better asset management
   * Configured cross-application image sharing between admin and e-shop
+- July 08, 2025: Supabase Storage integration:
+  * Replaced local file storage with Supabase Storage buckets
+  * Added uploadImageToSupabase helper function for image uploads
+  * Updated /api/sync-image endpoint to use Supabase Storage
+  * Created batch upload endpoint for multiple images
+  * Added Supabase connection test endpoint
+  * Generated comprehensive admin interface integration guide
+  * Implemented proper error handling for storage operations
 ```
 
 ## User Preferences
