@@ -126,8 +126,8 @@ export const ProductCard = ({ product, onAddToCart, className }: ProductCardProp
           <div className="flex gap-1 w-full min-w-0">
             <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
               <DialogTrigger asChild>
-                <Button variant="outline" className="flex-1 text-xs px-2 min-w-0 h-8">
-                  <Eye className="w-3 h-3 mr-1 flex-shrink-0" />
+                <Button variant="outline" className="flex-1 text-xs sm:text-sm px-2 sm:px-3 min-w-0">
+                  <Eye className="w-3 h-3 sm:w-4 sm:h-4 mr-1 flex-shrink-0" />
                   <span className="hidden sm:inline">Details</span>
                 </Button>
               </DialogTrigger>
@@ -228,16 +228,16 @@ export const ProductCard = ({ product, onAddToCart, className }: ProductCardProp
             
             <Button 
               onClick={handleQuickOrder}
-              className="flex-1 text-xs px-2 min-w-0 h-8 bg-orange-500 hover:bg-orange-600 text-white border-0"
+              className="flex-1 text-xs sm:text-sm px-2 sm:px-3 min-w-0 bg-orange-500 hover:bg-orange-600 text-white border-0"
             >
-              <Zap className="w-3 h-3 mr-1 flex-shrink-0" />
+              <Zap className="w-3 h-3 sm:w-4 sm:h-4 mr-1 flex-shrink-0" />
               <span className="hidden sm:inline">Order</span>
             </Button>
             
             <Dialog open={isAddToCartOpen} onOpenChange={setIsAddToCartOpen}>
               <DialogTrigger asChild>
-                <Button className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground text-xs px-2 min-w-0 h-8">
-                  <ShoppingCart className="w-3 h-3 mr-1 flex-shrink-0" />
+                <Button className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground text-xs sm:text-sm px-2 sm:px-3 min-w-0">
+                  <ShoppingCart className="w-3 h-3 sm:w-4 sm:h-4 mr-1 flex-shrink-0" />
                   <span className="hidden sm:inline">Add</span>
                 </Button>
               </DialogTrigger>
