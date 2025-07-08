@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'wouter';
-import { Plus, Minus, Trash2, ArrowLeft, CreditCard } from 'lucide-react';
+import { Plus, Minus, Trash2, ArrowLeft, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
@@ -147,57 +147,24 @@ const Cart = () => {
               ))}
             </div>
 
-            {/* Order Summary */}
+            {/* Order Actions */}
             <div className="lg:col-span-1">
               <Card className="sticky top-24">
-                <CardHeader>
-                  <CardTitle>Order Summary</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">
-                      Items ({getTotalItems()})
-                    </span>
-                    <span className="font-medium">
-                      ¥{getTotalPrice().toLocaleString()}
-                    </span>
-                  </div>
-                  
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Shipping</span>
-                    <span className="font-medium text-green-600">Free</span>
-                  </div>
-                  
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Tax</span>
-                    <span className="font-medium">
-                      ¥{Math.round(getTotalPrice() * 0.1).toLocaleString()}
-                    </span>
-                  </div>
-                  
-                  <Separator />
-                  
-                  <div className="flex justify-between text-lg font-bold">
-                    <span>Total</span>
-                    <span>
-                      ¥{Math.round(getTotalPrice() * 1.1).toLocaleString()}
-                    </span>
-                  </div>
-                  
-                  <div className="space-y-2">
+                <CardContent className="p-6">
+                  <div className="space-y-3">
                     <Button 
-                      className="w-full py-3 text-base"
+                      className="w-full py-3 text-base bg-green-600 hover:bg-green-700 text-white"
                       onClick={handleCheckout}
                       disabled={isProcessing}
                     >
                       {isProcessing ? (
                         <div className="flex items-center gap-2">
-                          <div className="w-4 h-4 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                           Processing...
                         </div>
                       ) : (
                         <div className="flex items-center gap-2">
-                          <CreditCard className="w-4 h-4" />
+                          <CheckCircle className="w-4 h-4" />
                           Confirm Order
                         </div>
                       )}
