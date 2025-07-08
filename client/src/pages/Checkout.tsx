@@ -195,7 +195,7 @@ const Checkout = () => {
 
               <Button 
                 type="submit" 
-                className="w-full py-3 text-base bg-green-700 hover:bg-green-800 text-white"
+                className="w-full py-3 text-base bg-primary hover:bg-primary/90 text-primary-foreground"
                 disabled={isProcessing}
               >
                 {isProcessing ? (
