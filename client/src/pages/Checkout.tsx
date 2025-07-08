@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Link, useLocation } from 'wouter';
 import { ArrowLeft, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -11,6 +11,58 @@ import { Navigation } from '@/components/Navigation';
 import { useCart } from '@/hooks/useCart';
 import { useToast } from '@/hooks/use-toast';
 
+// Algerian wilayas and their cities
+const ALGERIA_DATA = {
+  'Adrar': ['Adrar', 'Reggane', 'In Salah', 'Timimoun', 'Zaouiet Kounta'],
+  'Chlef': ['Chlef', 'Ténès', 'Benairia', 'El Karimia', 'Sobha'],
+  'Laghouat': ['Laghouat', 'Aflou', 'Ksar El Hirane', 'Brida', 'Gueltat Sidi Saad'],
+  'Oum El Bouaghi': ['Oum El Bouaghi', 'Aïn Beïda', 'Aïn M\'lila', 'Sigus', 'El Amiria'],
+  'Batna': ['Batna', 'Arris', 'Biskra', 'Barika', 'Merouana'],
+  'Béjaïa': ['Béjaïa', 'Akbou', 'Kherrata', 'Sidi Aïch', 'Souk El Tenine'],
+  'Biskra': ['Biskra', 'Tolga', 'Sidi Okba', 'Chetma', 'El Kantara'],
+  'Béchar': ['Béchar', 'Kenadsa', 'Abadla', 'Igli', 'Taghit'],
+  'Blida': ['Blida', 'Boufarik', 'Larbaa', 'Bouinan', 'Soumaa'],
+  'Bouira': ['Bouira', 'Lakhdaria', 'M\'Chedallah', 'Sour El Ghouzlane', 'Aïn Bessem'],
+  'Tamanrasset': ['Tamanrasset', 'In Guezzam', 'In Salah', 'Abalessa', 'Tin Zaouatine'],
+  'Tébessa': ['Tébessa', 'Cheria', 'El Aouinet', 'Bir El Ater', 'Negrine'],
+  'Tlemcen': ['Tlemcen', 'Maghnia', 'Remchi', 'Nedroma', 'Sebdou'],
+  'Tiaret': ['Tiaret', 'Sougueur', 'Mahdia', 'Frenda', 'Ksar Chellala'],
+  'Tizi Ouzou': ['Tizi Ouzou', 'Azazga', 'Draâ Ben Khedda', 'Tigzirt', 'Beni Douala'],
+  'Alger': ['Alger', 'Rouiba', 'Dar El Beïda', 'Zéralda', 'Cheraga', 'El Harrach'],
+  'Djelfa': ['Djelfa', 'Messaad', 'Aïn Oussera', 'Hassi Bahbah', 'Selmana'],
+  'Jijel': ['Jijel', 'Taher', 'El Milia', 'Sidi Abdelaziz', 'Settara'],
+  'Sétif': ['Sétif', 'El Eulma', 'Aïn Arnat', 'Bougaa', 'Béni Aziz'],
+  'Saïda': ['Saïda', 'Balloul', 'Ouled Brahim', 'Sidi Boubekeur', 'El Hassasna'],
+  'Skikda': ['Skikda', 'Collo', 'Azzaba', 'Tamalous', 'Aïn Charchar'],
+  'Sidi Bel Abbès': ['Sidi Bel Abbès', 'Tessala', 'Sfisef', 'Aïn Thrid', 'Telagh'],
+  'Annaba': ['Annaba', 'El Hadjar', 'Berrahal', 'Aïn Berda', 'Chetaïbi'],
+  'Guelma': ['Guelma', 'Bouchegouf', 'Héliopolis', 'Hammam Debagh', 'Oued Zenati'],
+  'Constantine': ['Constantine', 'El Khroub', 'Aïn Smara', 'Didouche Mourad', 'Hamma Bouziane'],
+  'Médéa': ['Médéa', 'Berrouaghia', 'Ksar El Boukhari', 'Ouzera', 'Aïn Boucif'],
+  'Mostaganem': ['Mostaganem', 'Relizane', 'Aïn Tédelès', 'Hassi Mameche', 'Sidi Ali'],
+  'M\'Sila': ['M\'Sila', 'Boussaâda', 'Sidi Aïssa', 'Aïn El Hadjel', 'Magra'],
+  'Mascara': ['Mascara', 'Sig', 'Mohammadia', 'Ghriss', 'Bouhanifia'],
+  'Ouargla': ['Ouargla', 'Touggourt', 'Hassi Messaoud', 'El Hadjira', 'Témacine'],
+  'Oran': ['Oran', 'Es Senia', 'Bir El Djir', 'Aïn Türk', 'Bethioua'],
+  'El Bayadh': ['El Bayadh', 'Rogassa', 'Stitten', 'Brezina', 'Boualem'],
+  'Illizi': ['Illizi', 'Djanet', 'In Aménas', 'Bordj Omar Driss', 'Debdeb'],
+  'Bordj Bou Arréridj': ['Bordj Bou Arréridj', 'Ras El Oued', 'Bir Kasdali', 'El Achir', 'Aïn Taghrout'],
+  'Boumerdès': ['Boumerdès', 'Dellys', 'Naciria', 'Isser', 'Bordj Menaïel'],
+  'El Tarf': ['El Tarf', 'El Kala', 'Bouteldja', 'Ben M\'Hidi', 'Bougous'],
+  'Tindouf': ['Tindouf', 'Oum El Assel'],
+  'Tissemsilt': ['Tissemsilt', 'Theniet El Had', 'Bordj Bou Naama', 'Lazharia', 'Khemisti'],
+  'El Oued': ['El Oued', 'Guemar', 'Reguiba', 'Magrane', 'Still'],
+  'Khenchela': ['Khenchela', 'Aïn Touila', 'Kais', 'Baghai', 'El Hamma'],
+  'Souk Ahras': ['Souk Ahras', 'Sedrata', 'Haddada', 'Ouled Driss', 'Taoura'],
+  'Tipaza': ['Tipaza', 'Koléa', 'Cherchell', 'Hadjout', 'Menaceur'],
+  'Mila': ['Mila', 'Ferdjioua', 'Chelghoum Laïd', 'Rouached', 'Hamala'],
+  'Aïn Defla': ['Aïn Defla', 'Khemis Miliana', 'El Attaf', 'Boumedfaa', 'Djelida'],
+  'Naâma': ['Naâma', 'Mécheria', 'Aïn Sefra', 'Tiout', 'Sfissifa'],
+  'Aïn Témouchent': ['Aïn Témouchent', 'Hammam Bouhadjar', 'Beni Saf', 'El Malah', 'Ouled Kihal'],
+  'Ghardaïa': ['Ghardaïa', 'El Meniaa', 'Berriane', 'Metlili', 'Guerrara'],
+  'Relizane': ['Relizane', 'Oued Rhiou', 'Mascara', 'Mazouna', 'Yellel']
+};
+
 const Checkout = () => {
   const [, setLocation] = useLocation();
   const { getTotalItems, clearCart } = useCart();
@@ -18,29 +70,41 @@ const Checkout = () => {
   const [isProcessing, setIsProcessing] = useState(false);
 
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    country: 'Algeria',
+    name: '',
     streetAddress: '',
+    state: 'Alger',
     city: '',
-    state: 'Algiers',
     phone: '0XXXXXXXXX',
     email: '',
     orderNotes: ''
   });
 
   const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
+    setFormData(prev => {
+      const newData = {
+        ...prev,
+        [field]: value
+      };
+      
+      // If state changes, reset city
+      if (field === 'state') {
+        newData.city = '';
+      }
+      
+      return newData;
+    });
   };
+
+  // Get available cities based on selected state
+  const availableCities = useMemo(() => {
+    return formData.state ? ALGERIA_DATA[formData.state as keyof typeof ALGERIA_DATA] || [] : [];
+  }, [formData.state]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     // Basic validation
-    if (!formData.firstName || !formData.lastName || !formData.streetAddress || !formData.city || !formData.phone || !formData.email) {
+    if (!formData.name || !formData.streetAddress || !formData.state || !formData.city || !formData.phone || !formData.email) {
       toast({
         title: "Please fill in all required fields",
         description: "All fields marked with * are required.",
@@ -95,37 +159,14 @@ const Checkout = () => {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="firstName">First name *</Label>
-                  <Input
-                    id="firstName"
-                    value={formData.firstName}
-                    onChange={(e) => handleInputChange('firstName', e.target.value)}
-                    required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="lastName">Last name *</Label>
-                  <Input
-                    id="lastName"
-                    value={formData.lastName}
-                    onChange={(e) => handleInputChange('lastName', e.target.value)}
-                    required
-                  />
-                </div>
-              </div>
-
               <div>
-                <Label htmlFor="country">Country / Region *</Label>
-                <Select value={formData.country} onValueChange={(value) => handleInputChange('country', value)}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Algeria">Algeria</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Label htmlFor="name">Name *</Label>
+                <Input
+                  id="name"
+                  value={formData.name}
+                  onChange={(e) => handleInputChange('name', e.target.value)}
+                  required
+                />
               </div>
 
               <div>
@@ -140,24 +181,33 @@ const Checkout = () => {
               </div>
 
               <div>
-                <Label htmlFor="city">Town / City *</Label>
-                <Input
-                  id="city"
-                  placeholder="Select an option..."
-                  value={formData.city}
-                  onChange={(e) => handleInputChange('city', e.target.value)}
-                  required
-                />
-              </div>
-
-              <div>
                 <Label htmlFor="state">State / County *</Label>
                 <Select value={formData.state} onValueChange={(value) => handleInputChange('state', value)}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Algiers">Algiers</SelectItem>
+                    {Object.keys(ALGERIA_DATA).map((wilaya) => (
+                      <SelectItem key={wilaya} value={wilaya}>
+                        {wilaya}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label htmlFor="city">Town / City *</Label>
+                <Select value={formData.city} onValueChange={(value) => handleInputChange('city', value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a city..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {availableCities.map((city) => (
+                      <SelectItem key={city} value={city}>
+                        {city}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
