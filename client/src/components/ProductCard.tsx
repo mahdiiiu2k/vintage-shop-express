@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Eye, ShoppingCart } from 'lucide-react';
+import { Plus, Eye, ShoppingCart, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -33,6 +33,7 @@ export const ProductCard = ({ product, onAddToCart, className }: ProductCardProp
   const [selectedColor, setSelectedColor] = useState('');
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [isAddToCartOpen, setIsAddToCartOpen] = useState(false);
+  const [isQuickOrderOpen, setIsQuickOrderOpen] = useState(false);
   const { toast } = useToast();
 
   const handleAddToCart = () => {
@@ -53,6 +54,27 @@ export const ProductCard = ({ product, onAddToCart, className }: ProductCardProp
     
     // Close the modal after successful add to cart
     setIsAddToCartOpen(false);
+  };
+
+  const handleQuickOrder = () => {
+    // Use default selections for quick order
+    const defaultSize = product.sizes[0] || '';
+    const defaultColor = product.colors[0] || '';
+    
+    if (!defaultSize || !defaultColor) {
+      toast({
+        title: "Quick order unavailable",
+        description: "This product requires size and color selection.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    onAddToCart(product, defaultSize, defaultColor);
+    toast({
+      title: "Quick order successful!",
+      description: `${product.name} (${defaultSize}, ${defaultColor}) added to cart instantly.`,
+    });
   };
 
 
@@ -106,8 +128,8 @@ export const ProductCard = ({ product, onAddToCart, className }: ProductCardProp
               <DialogTrigger asChild>
                 <Button variant="outline" className="flex-1 text-xs sm:text-sm px-1 sm:px-3 min-w-0">
                   <Eye className="w-3 h-3 sm:w-4 sm:h-4 mr-1 flex-shrink-0" />
-                  <span className="hidden md:inline">View Details</span>
-                  <span className="md:hidden">Details</span>
+                  <span className="hidden lg:inline">View Details</span>
+                  <span className="lg:hidden">Details</span>
                 </Button>
               </DialogTrigger>
               <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -205,12 +227,22 @@ export const ProductCard = ({ product, onAddToCart, className }: ProductCardProp
               </DialogContent>
             </Dialog>
             
+            <Button 
+              onClick={handleQuickOrder}
+              variant="secondary" 
+              className="flex-1 text-xs sm:text-sm px-1 sm:px-3 min-w-0 bg-orange-500 hover:bg-orange-600 text-white"
+            >
+              <Zap className="w-3 h-3 sm:w-4 sm:h-4 mr-1 flex-shrink-0" />
+              <span className="hidden lg:inline">Quick Order</span>
+              <span className="lg:hidden">Quick</span>
+            </Button>
+            
             <Dialog open={isAddToCartOpen} onOpenChange={setIsAddToCartOpen}>
               <DialogTrigger asChild>
                 <Button className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground text-xs sm:text-sm px-1 sm:px-3 min-w-0">
                   <Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-1 flex-shrink-0" />
-                  <span className="hidden md:inline">Add to Cart</span>
-                  <span className="md:hidden">Add</span>
+                  <span className="hidden lg:inline">Add to Cart</span>
+                  <span className="lg:hidden">Add</span>
                 </Button>
               </DialogTrigger>
               <DialogContent className="sm:max-w-md">
