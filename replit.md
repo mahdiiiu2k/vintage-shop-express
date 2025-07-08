@@ -130,6 +130,12 @@ Changelog:
   * Updated frontend to fetch products from database
   * Configured PostgreSQL connection with SSL for Supabase
   * Added error handling for database connection issues
+- July 08, 2025: Image upload and display system:
+  * Added static file serving for uploaded images (/uploads endpoint)
+  * Created image upload API for syncing images from admin interface
+  * Implemented fallback image handling for missing images
+  * Added image proxy endpoint for better asset management
+  * Configured cross-application image sharing between admin and e-shop
 ```
 
 ## User Preferences
@@ -137,3 +143,12 @@ Changelog:
 ```
 Preferred communication style: Simple, everyday language.
 ```
+
+## Image Management Notes
+
+The e-shop and admin interface share a Supabase database but run in separate environments. When images are uploaded through the admin interface:
+1. Admin interface saves images to `/uploads/` directory in its environment
+2. Database stores the image path as `/uploads/filename.png`
+3. E-shop needs access to the same image files for proper display
+
+Current solution: Static file serving with fallback handling and manual image sync when needed.

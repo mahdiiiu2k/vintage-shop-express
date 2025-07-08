@@ -71,6 +71,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // File upload endpoint to sync images from admin interface
+  app.post("/api/upload-image", async (req, res) => {
+    try {
+      const { filename, imageData } = req.body;
+      
+      if (!filename || !imageData) {
+        return res.status(400).json({ error: "Filename and imageData are required" });
+      }
+
+      const imagePath = path.join(process.cwd(), 'uploads', path.basename(filename));
+      
+      // If imageData is base64, decode it; otherwise treat as URL to fetch
+      if (imageData.startsWith('data:')) {
+        const base64Data = imageData.replace(/^data:image\/\w+;base64,/, '');
+        fs.writeFileSync(imagePath, Buffer.from(base64Data, 'base64'));
+      } else if (imageData.startsWith('http')) {
+        // Fetch from URL and save
+        const response = await fetch(imageData);
+        const buffer = await response.arrayBuffer();
+        fs.writeFileSync(imagePath, Buffer.from(buffer));
+      }
+
+      res.json({ 
+        success: true, 
+        imagePath: `/uploads/${path.basename(filename)}` 
+      });
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      res.status(500).json({ error: "Failed to upload image" });
+    }
+  });
+
   // Image proxy endpoint to handle images from admin interface
   app.get("/api/image-proxy", async (req, res) => {
     try {
