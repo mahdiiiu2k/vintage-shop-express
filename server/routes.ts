@@ -71,10 +71,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // File upload endpoint to sync images from admin interface
-  app.post("/api/upload-image", async (req, res) => {
+  // File upload endpoint to receive images from admin interface
+  app.post("/api/sync-image", async (req, res) => {
     try {
-      const { filename, imageData } = req.body;
+      const { filename, imageData, productId } = req.body;
       
       if (!filename || !imageData) {
         return res.status(400).json({ error: "Filename and imageData are required" });
@@ -82,25 +82,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const imagePath = path.join(process.cwd(), 'uploads', path.basename(filename));
       
-      // If imageData is base64, decode it; otherwise treat as URL to fetch
+      // Handle base64 encoded image data
       if (imageData.startsWith('data:')) {
         const base64Data = imageData.replace(/^data:image\/\w+;base64,/, '');
         fs.writeFileSync(imagePath, Buffer.from(base64Data, 'base64'));
       } else if (imageData.startsWith('http')) {
-        // Fetch from URL and save
+        // Fetch from external URL and save locally
         const response = await fetch(imageData);
         const buffer = await response.arrayBuffer();
         fs.writeFileSync(imagePath, Buffer.from(buffer));
+      } else {
+        // Direct binary data
+        fs.writeFileSync(imagePath, Buffer.from(imageData, 'binary'));
       }
 
+      console.log(`Image synced successfully: ${filename} for product ${productId || 'unknown'}`);
+      
       res.json({ 
         success: true, 
-        imagePath: `/uploads/${path.basename(filename)}` 
+        imagePath: `/uploads/${path.basename(filename)}`,
+        message: "Image synchronized to e-shop successfully"
       });
     } catch (error) {
-      console.error("Error uploading image:", error);
-      res.status(500).json({ error: "Failed to upload image" });
+      console.error("Error syncing image:", error);
+      res.status(500).json({ error: "Failed to sync image" });
     }
+  });
+
+  // CORS-enabled file upload endpoint for admin interface
+  app.post("/api/upload-image", (req, res) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type');
+    
+    if (req.method === 'OPTIONS') {
+      return res.sendStatus(200);
+    }
+    
+    // Forward to sync endpoint
+    req.url = '/api/sync-image';
+    app._router.handle(req, res);
   });
 
   // Image proxy endpoint to handle images from admin interface

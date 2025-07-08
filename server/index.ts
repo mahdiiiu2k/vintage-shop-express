@@ -6,8 +6,12 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// Serve uploaded images statically
-app.use('/uploads', express.static('uploads'));
+// Serve uploaded images statically with CORS headers
+app.use('/uploads', (req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET');
+  next();
+}, express.static('uploads'));
 
 app.use((req, res, next) => {
   const start = Date.now();

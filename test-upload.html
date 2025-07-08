@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Image Upload Test for E-shop</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .upload-area { border: 2px dashed #ccc; padding: 20px; margin: 20px 0; }
+        button { padding: 10px 20px; background: #007bff; color: white; border: none; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>Test Image Upload to E-shop</h1>
+    <p>Use this to test uploading an image that will appear in your e-shop.</p>
+    
+    <div class="upload-area">
+        <input type="file" id="imageFile" accept="image/*">
+        <br><br>
+        <input type="text" id="productId" placeholder="Product ID (e.g., 6)" value="6">
+        <br><br>
+        <button onclick="uploadImage()">Upload Image to E-shop</button>
+    </div>
+    
+    <div id="result"></div>
+
+    <script>
+        async function uploadImage() {
+            const fileInput = document.getElementById('imageFile');
+            const productId = document.getElementById('productId').value;
+            const resultDiv = document.getElementById('result');
+            
+            if (!fileInput.files[0]) {
+                alert('Please select an image file');
+                return;
+            }
+            
+            const file = fileInput.files[0];
+            const filename = `image-${Date.now()}-${Math.random().toString(36).substr(2, 9)}.${file.name.split('.').pop()}`;
+            
+            try {
+                // Convert to base64
+                const reader = new FileReader();
+                reader.onload = async function(e) {
+                    const base64Data = e.target.result;
+                    
+                    try {
+                        const response = await fetch('/api/sync-image', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                filename: filename,
+                                imageData: base64Data,
+                                productId: productId
+                            })
+                        });
+                        
+                        const result = await response.json();
+                        
+                        if (result.success) {
+                            resultDiv.innerHTML = `
+                                <h3>Success!</h3>
+                                <p>Image uploaded successfully: ${result.imagePath}</p>
+                                <p>Now update your product in the admin interface to use this path: <code>${result.imagePath}</code></p>
+                                <img src="${result.imagePath}" style="max-width: 200px; margin-top: 10px;">
+                            `;
+                        } else {
+                            resultDiv.innerHTML = `<p style="color: red;">Error: ${result.error}</p>`;
+                        }
+                    } catch (error) {
+                        resultDiv.innerHTML = `<p style="color: red;">Upload failed: ${error.message}</p>`;
+                    }
+                };
+                reader.readAsDataURL(file);
+            } catch (error) {
+                resultDiv.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+</html>
