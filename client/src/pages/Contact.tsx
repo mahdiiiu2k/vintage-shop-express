@@ -14,6 +14,7 @@ const Contact = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    phone: '',
     subject: '',
     message: ''
   });
@@ -30,16 +31,16 @@ const Contact = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (formData.name && formData.email && formData.message) {
+    if (formData.name && formData.message) {
       toast({
         title: "Message Sent!",
         description: "Thank you for your message. We'll get back to you soon.",
       });
-      setFormData({ name: '', email: '', subject: '', message: '' });
+      setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
     } else {
       toast({
         title: "Please fill in all required fields",
-        description: "Name, email, and message are required.",
+        description: "Name and message are required.",
         variant: "destructive"
       });
     }
@@ -86,18 +87,29 @@ const Contact = () => {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="email" className="text-foreground text-sm">Email *</Label>
+                    <Label htmlFor="phone" className="text-foreground text-sm">Phone Number</Label>
                     <Input
-                      id="email"
-                      name="email"
-                      type="email"
-                      placeholder="your.email@example.com"
-                      value={formData.email}
+                      id="phone"
+                      name="phone"
+                      type="tel"
+                      placeholder="+1 (555) 123-4567"
+                      value={formData.phone}
                       onChange={handleInputChange}
                       className="mt-1 h-12"
-                      required
                     />
                   </div>
+                </div>
+                <div>
+                  <Label htmlFor="email" className="text-foreground text-sm">Email (Optional)</Label>
+                  <Input
+                    id="email"
+                    name="email"
+                    type="email"
+                    placeholder="your.email@example.com"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    className="mt-1 h-12"
+                  />
                 </div>
                 <div>
                   <Label htmlFor="subject" className="text-foreground text-sm">Subject</Label>

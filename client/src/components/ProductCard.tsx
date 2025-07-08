@@ -104,12 +104,7 @@ export const ProductCard = ({ product, onAddToCart, className }: ProductCardProp
             <h3 className="font-semibold text-lg text-foreground group-hover:text-primary transition-colors">
               {product.name}
             </h3>
-            <div className="flex items-center space-x-1">
-              <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-              <span className="text-sm text-muted-foreground">
-                5.0 (12)
-              </span>
-            </div>
+
           </div>
           
           <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
@@ -155,19 +150,7 @@ export const ProductCard = ({ product, onAddToCart, className }: ProductCardProp
                         <span className="text-2xl sm:text-3xl font-bold text-foreground">
                           ¥{product.price.toLocaleString()}
                         </span>
-                        <div className="flex items-center space-x-2 mt-2">
-                          <div className="flex">
-                            {[...Array(5)].map((_, i) => (
-                              <Star 
-                                key={i} 
-                                className={`w-3 h-3 sm:w-4 sm:h-4 ${i < Math.floor(product.rating) ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`} 
-                              />
-                            ))}
-                          </div>
-                          <span className="text-xs sm:text-sm text-muted-foreground">
-                            {product.rating} ({product.reviews} reviews)
-                          </span>
-                        </div>
+
                       </div>
                       
                       <p className="text-muted-foreground">{product.description}</p>
@@ -231,10 +214,7 @@ export const ProductCard = ({ product, onAddToCart, className }: ProductCardProp
                         <span className="text-muted-foreground">Available Colors:</span>
                         <span className="ml-2 font-medium">{product.colors.join(', ')}</span>
                       </div>
-                      <div>
-                        <span className="text-muted-foreground">Rating:</span>
-                        <span className="ml-2 font-medium">{product.rating}/5.0</span>
-                      </div>
+
                     </div>
                   </div>
                 </div>
