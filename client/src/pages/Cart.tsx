@@ -184,29 +184,31 @@ const Cart = () => {
                     </span>
                   </div>
                   
-                  <Button 
-                    className="w-full py-3 text-base"
-                    onClick={handleCheckout}
-                    disabled={isProcessing}
-                  >
-                    {isProcessing ? (
-                      <div className="flex items-center gap-2">
-                        <div className="w-4 h-4 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
-                        Processing...
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-2">
-                        <CreditCard className="w-4 h-4" />
-                        Proceed to Checkout
-                      </div>
-                    )}
-                  </Button>
-                  
-                  <Link href="/shop" className="block">
-                    <Button variant="outline" className="w-full">
-                      Continue Shopping
+                  <div className="space-y-2">
+                    <Button 
+                      className="w-full py-3 text-base"
+                      onClick={handleCheckout}
+                      disabled={isProcessing}
+                    >
+                      {isProcessing ? (
+                        <div className="flex items-center gap-2">
+                          <div className="w-4 h-4 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
+                          Processing...
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <CreditCard className="w-4 h-4" />
+                          Confirm Order
+                        </div>
+                      )}
                     </Button>
-                  </Link>
+                    
+                    <Link href="/shop" className="block">
+                      <Button variant="outline" className="w-full">
+                        Continue Shopping
+                      </Button>
+                    </Link>
+                  </div>
                 </CardContent>
               </Card>
             </div>
