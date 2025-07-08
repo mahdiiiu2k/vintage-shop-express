@@ -72,7 +72,7 @@ export const ProductCard = ({ product, onAddToCart, className }: ProductCardProp
       <CardContent className="p-0">
         <div className="relative overflow-hidden">
           <img
-            src={product.image_url || "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=400&h=500&fit=crop"}
+            src={product.image_url ? (product.image_url.startsWith('http') ? product.image_url : `${window.location.origin}${product.image_url}`) : "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=400&h=500&fit=crop"}
             alt={product.name}
             className="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-105"
           />
