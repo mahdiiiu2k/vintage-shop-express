@@ -190,17 +190,30 @@ export const ProductCard = ({ product, onAddToCart, className }: ProductCardProp
                         </div>
                       </div>
                       
-                      <Button 
-                        onClick={() => {
-                          handleAddToCart();
-                          setIsDetailsOpen(false);
-                        }} 
-                        className="w-full" 
-                        size="lg"
-                      >
-                        <ShoppingCart className="w-4 h-4 mr-2" />
-                        Add to Cart
-                      </Button>
+                      <div className="flex gap-2">
+                        <Button 
+                          onClick={() => {
+                            handleQuickOrder();
+                            setIsDetailsOpen(false);
+                          }} 
+                          className="flex-1 bg-green-600 hover:bg-green-700 text-white" 
+                          size="lg"
+                        >
+                          <Package className="w-4 h-4 mr-2" />
+                          Quick Order
+                        </Button>
+                        <Button 
+                          onClick={() => {
+                            handleAddToCart();
+                            setIsDetailsOpen(false);
+                          }} 
+                          className="flex-1" 
+                          size="lg"
+                        >
+                          <ShoppingCart className="w-4 h-4 mr-2" />
+                          Add to Cart
+                        </Button>
+                      </div>
                     </div>
                   </div>
                   
