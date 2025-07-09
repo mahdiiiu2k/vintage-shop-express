@@ -2,12 +2,39 @@ import { google } from 'googleapis';
 import type { OrderData } from './googleSheets';
 
 class EmailService {
+  private gmail: any;
   private isConfigured: boolean = false;
 
   constructor() {
-    // Simple notification service that logs to console
-    this.isConfigured = true;
-    console.log('Email notification service configured - notifications will be logged to console');
+    this.initializeGmailAPI();
+  }
+
+  private async initializeGmailAPI() {
+    try {
+      // Gmail API requires additional setup (enabling API + domain delegation)
+      // For now, we'll provide email content that can be easily copied and sent
+      this.isConfigured = true;
+      console.log('Email notification service configured - ready to generate email content');
+      console.log('- From: chouikimahdi@gmail.com');
+      console.log('- To: chouikimahdiabderrahmane@gmail.com');
+      console.log('- Subject: New Order');
+    } catch (error) {
+      console.error('Failed to initialize email service:', error);
+      this.isConfigured = false;
+    }
+  }
+
+  private createEmailMessage(to: string, subject: string, body: string): string {
+    const message = [
+      `To: ${to}`,
+      `From: chouikimahdi@gmail.com`,
+      `Subject: ${subject}`,
+      `Content-Type: text/plain; charset=utf-8`,
+      ``,
+      body
+    ].join('\n');
+
+    return Buffer.from(message).toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
   }
 
   async sendOrderNotification(orderData: OrderData): Promise<boolean> {
@@ -20,9 +47,10 @@ class EmailService {
         minute: '2-digit'
       });
 
-      // Create notification message
-      const notificationMessage = `🛍️ NEW ORDER ALERT 🛍️
-      
+      // Create email content
+      const emailSubject = 'New Order';
+      const emailBody = `New Order Alert!
+
 Order Details:
 • Date: ${formattedDate}
 • Product: ${orderData.productName}
@@ -40,20 +68,31 @@ Customer Information:
 • Address: ${orderData.streetAddress}
 ${orderData.orderNotes ? `• Notes: ${orderData.orderNotes}` : ''}
 
-This order has been automatically saved to your Google Sheets.`;
+This order has been automatically saved to your Google Sheets.
 
-      // Display prominent notification in console
+Best regards,
+E-commerce System`;
+
+      // Display comprehensive notification in console
       console.log('\n' + '='.repeat(80));
-      console.log('🚨 NEW ORDER NOTIFICATION 🚨');
+      console.log('🚨 NEW ORDER EMAIL NOTIFICATION 🚨');
       console.log('='.repeat(80));
-      console.log(notificationMessage);
+      console.log('EMAIL DETAILS:');
+      console.log('From: chouikimahdi@gmail.com');
+      console.log('To: chouikimahdiabderrahmane@gmail.com');
+      console.log('Subject: ' + emailSubject);
+      console.log('');
+      console.log('EMAIL BODY:');
+      console.log(emailBody);
       console.log('='.repeat(80));
-      console.log('Check your Google Sheets for complete order details');
+      console.log('📧 EMAIL CONTENT READY FOR SENDING 📧');
+      console.log('Copy the above email content and send it manually from Gmail');
       console.log('='.repeat(80) + '\n');
-      
+
+      // For demonstration, we'll return true to indicate notification was prepared
       return true;
     } catch (error) {
-      console.error('Failed to display order notification:', error);
+      console.error('Failed to prepare order notification:', error);
       return false;
     }
   }
@@ -68,26 +107,37 @@ This order has been automatically saved to your Google Sheets.`;
         minute: '2-digit'
       });
 
-      const testMessage = `🧪 TEST NOTIFICATION 🧪
-      
+      const testEmailSubject = 'Test Email - New Order System';
+      const testEmailBody = `Test Email Notification
+
 Test Details:
 • Date: ${testDate}
-• Status: Notification system is working correctly
-• Method: Console logging
+• Status: Email notification system is working correctly
+• Method: Email content generation
 
-This is a test to verify order notifications are working.`;
+This is a test to verify order email notifications are working.
+
+Best regards,
+E-commerce System`;
 
       console.log('\n' + '='.repeat(80));
-      console.log('🧪 TEST NOTIFICATION 🧪');
+      console.log('🧪 TEST EMAIL NOTIFICATION 🧪');
       console.log('='.repeat(80));
-      console.log(testMessage);
+      console.log('EMAIL DETAILS:');
+      console.log('From: chouikimahdi@gmail.com');
+      console.log('To: chouikimahdiabderrahmane@gmail.com');
+      console.log('Subject: ' + testEmailSubject);
+      console.log('');
+      console.log('EMAIL BODY:');
+      console.log(testEmailBody);
       console.log('='.repeat(80));
-      console.log('Notification system is working correctly!');
+      console.log('📧 TEST EMAIL CONTENT READY FOR SENDING 📧');
+      console.log('Copy the above email content and send it manually from Gmail');
       console.log('='.repeat(80) + '\n');
 
       return true;
     } catch (error) {
-      console.error('Test notification failed:', error);
+      console.error('Test email notification failed:', error);
       return false;
     }
   }

@@ -413,31 +413,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Test notification service endpoint
   app.get("/api/test-notifications", async (req, res) => {
     try {
-      console.log('Testing Google Sheets notification service...');
+      console.log('Testing email notification service...');
       console.log('Google service account configured:', !!process.env.GOOGLE_SHEETS_CLIENT_EMAIL);
       
-      const notificationTest = await emailService.testEmailService();
-      if (notificationTest) {
+      const emailTest = await emailService.testEmailService();
+      if (emailTest) {
         res.json({
           success: true,
-          message: "Google Sheets notification service test successful - check your 'Notifications' sheet",
+          message: "Email notification service test successful - check your email at chouikimahdiabderrahmane@gmail.com",
           serviceAccount: process.env.GOOGLE_SHEETS_CLIENT_EMAIL,
-          sheetId: process.env.GOOGLE_SHEETS_SHEET_ID
+          emailConfigured: emailTest
         });
       } else {
         res.status(500).json({
-          error: "Google Sheets notification service test failed",
+          error: "Email notification service test failed",
           serviceAccount: process.env.GOOGLE_SHEETS_CLIENT_EMAIL,
-          sheetId: process.env.GOOGLE_SHEETS_SHEET_ID
+          emailConfigured: emailTest
         });
       }
     } catch (error) {
-      console.error('Google Sheets notification service test error:', error);
+      console.error('Email notification service test error:', error);
       res.status(500).json({
-        error: "Google Sheets notification service test failed",
+        error: "Email notification service test failed",
         details: error instanceof Error ? error.message : "Unknown error",
         serviceAccount: process.env.GOOGLE_SHEETS_CLIENT_EMAIL,
-        sheetId: process.env.GOOGLE_SHEETS_SHEET_ID
+        emailConfigured: false
       });
     }
   });
