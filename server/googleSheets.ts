@@ -67,17 +67,16 @@ class GoogleSheetsService {
         'Order Notes'
       ];
 
-      // If no headers or headers don't match, add them
-      if (!headers || headers.length !== expectedHeaders.length) {
-        await this.sheets.spreadsheets.values.update({
-          spreadsheetId: this.sheetId,
-          range: 'A1:K1',
-          valueInputOption: 'RAW',
-          requestBody: {
-            values: [expectedHeaders],
-          },
-        });
-      }
+      // Always update headers to ensure they're correct
+      await this.sheets.spreadsheets.values.update({
+        spreadsheetId: this.sheetId,
+        range: 'A1:K1',
+        valueInputOption: 'RAW',
+        requestBody: {
+          values: [expectedHeaders],
+        },
+      });
+      console.log('Headers updated in Google Sheet:', expectedHeaders);
     } catch (error) {
       console.error('Error initializing Google Sheet:', error);
       throw error;
@@ -89,8 +88,15 @@ class GoogleSheetsService {
       // Ensure sheet is initialized
       await this.initializeSheet();
 
+      // Format date to be more readable
+      const formattedDate = new Date(orderData.orderDate).toLocaleDateString('en-GB', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      });
+
       const values = [
-        orderData.orderDate,
+        formattedDate,
         orderData.productName,
         orderData.size,
         orderData.color,
@@ -114,6 +120,7 @@ class GoogleSheetsService {
       });
 
       console.log('Order added to Google Sheets successfully');
+      console.log('Data sent to sheet:', values);
     } catch (error) {
       console.error('Error adding order to Google Sheets:', error);
       throw error;
