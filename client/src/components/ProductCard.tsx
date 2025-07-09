@@ -68,9 +68,13 @@ export const ProductCard = ({ product, onAddToCart, className }: ProductCardProp
       return;
     }
 
-    // Add to cart and redirect to checkout
+    // Add to cart and redirect to checkout after a small delay to ensure cart state is updated
     onAddToCart(product, selectedSize, selectedColor);
-    setLocation('/checkout');
+    
+    // Use setTimeout to ensure cart state is updated before navigation
+    setTimeout(() => {
+      setLocation('/checkout');
+    }, 100);
   };
 
 
