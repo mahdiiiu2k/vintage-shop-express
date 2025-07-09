@@ -49,23 +49,21 @@ class GoogleSheetsService {
       // Check if sheet exists and has headers
       const response = await this.sheets.spreadsheets.values.get({
         spreadsheetId: this.sheetId,
-        range: 'A1:M1',
+        range: 'A1:K1',
       });
 
       const headers = response.data.values?.[0];
       const expectedHeaders = [
         'Order Date',
-        'Customer Name',
-        'Wilaya',
-        'City',
-        'Street Address',
-        'Phone',
-        'Email',
         'Product Name',
         'Size',
         'Color',
+        'Phone',
+        'Wilaya',
+        'City',
+        'Street Address',
+        'Name',
         'Price',
-        'Quantity',
         'Order Notes'
       ];
 
@@ -73,7 +71,7 @@ class GoogleSheetsService {
       if (!headers || headers.length !== expectedHeaders.length) {
         await this.sheets.spreadsheets.values.update({
           spreadsheetId: this.sheetId,
-          range: 'A1:M1',
+          range: 'A1:K1',
           valueInputOption: 'RAW',
           requestBody: {
             values: [expectedHeaders],
@@ -93,23 +91,21 @@ class GoogleSheetsService {
 
       const values = [
         orderData.orderDate,
-        orderData.customerName,
-        orderData.wilaya,
-        orderData.city,
-        orderData.streetAddress,
-        orderData.phone,
-        orderData.email,
         orderData.productName,
         orderData.size,
         orderData.color,
+        orderData.phone,
+        orderData.wilaya,
+        orderData.city,
+        orderData.streetAddress,
+        orderData.customerName,
         orderData.price,
-        orderData.quantity.toString(),
         orderData.orderNotes || ''
       ];
 
       await this.sheets.spreadsheets.values.append({
         spreadsheetId: this.sheetId,
-        range: 'A:M',
+        range: 'A:K',
         valueInputOption: 'RAW',
         insertDataOption: 'INSERT_ROWS',
         requestBody: {

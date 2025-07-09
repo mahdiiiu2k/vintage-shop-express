@@ -149,6 +149,13 @@ Changelog:
   * Added comprehensive testing suite and documentation
   * Confirmed end-to-end functionality between admin and e-shop
   * Images now use permanent Supabase URLs with CDN distribution
+- July 09, 2025: Google Sheets integration for order management:
+  * Integrated Google Sheets API for order data storage
+  * Created service account authentication with proper permissions
+  * Implemented order submission endpoint with Algerian billing format
+  * Added custom column order: Order Date, Product Name, Size, Color, Phone, Wilaya, City, Street Address, Name, Price, Order Notes
+  * Successfully tested end-to-end order flow from checkout to Google Sheets
+  * Orders now automatically sync to Google Sheets for delivery management
 ```
 
 ## User Preferences
