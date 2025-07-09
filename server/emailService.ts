@@ -1,6 +1,15 @@
 import nodemailer from 'nodemailer';
 import type { OrderData } from './googleSheets';
 
+export interface ContactMessageData {
+  name: string;
+  email: string;
+  phone: string;
+  subject: string;
+  message: string;
+  timestamp: string;
+}
+
 class EmailService {
   private transporter: nodemailer.Transporter;
   private isConfigured: boolean = false;
@@ -112,6 +121,77 @@ E-commerce System`;
       }
     } catch (error) {
       console.error('Failed to prepare order notification:', error);
+      return false;
+    }
+  }
+
+  async sendContactMessage(contactData: ContactMessageData): Promise<boolean> {
+    try {
+      const formattedDate = new Date(contactData.timestamp).toLocaleDateString('en-GB', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+
+      // Create email content
+      const emailSubject = 'New Contact Message';
+      const emailBody = `You got a new message
+
+Message Details:
+• Date: ${formattedDate}
+• Name: ${contactData.name}
+• Email: ${contactData.email || 'Not provided'}
+• Phone: ${contactData.phone || 'Not provided'}
+• Subject: ${contactData.subject || 'No subject'}
+
+Message:
+${contactData.message}
+
+Best regards,
+E-commerce Contact System`;
+
+      // Display notification in console
+      console.log('\n' + '='.repeat(80));
+      console.log('📧 NEW CONTACT MESSAGE EMAIL NOTIFICATION 📧');
+      console.log('='.repeat(80));
+      console.log('Sending email automatically...');
+      console.log('From: chouikimahdi@gmail.com');
+      console.log('To: chouikimahdiabderrahmane@gmail.com');
+      console.log('Subject: ' + emailSubject);
+      console.log('='.repeat(80));
+
+      // Send email automatically through Gmail SMTP
+      if (this.isConfigured) {
+        try {
+          const mailOptions = {
+            from: 'chouikimahdi@gmail.com',
+            to: 'chouikimahdiabderrahmane@gmail.com',
+            subject: emailSubject,
+            text: emailBody
+          };
+
+          const info = await this.transporter.sendMail(mailOptions);
+
+          console.log('✅ Contact message email sent successfully via Gmail SMTP!');
+          console.log('Message ID:', info.messageId);
+          console.log('='.repeat(80) + '\n');
+          return true;
+        } catch (emailError) {
+          console.error('❌ Failed to send contact message email:', emailError);
+          console.log('Email content:');
+          console.log(emailBody);
+          console.log('='.repeat(80) + '\n');
+          return false;
+        }
+      } else {
+        console.log('❌ Gmail SMTP not configured - contact message email not sent');
+        console.log('='.repeat(80) + '\n');
+        return false;
+      }
+    } catch (error) {
+      console.error('Error in sendContactMessage:', error);
       return false;
     }
   }

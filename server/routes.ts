@@ -7,7 +7,7 @@ import path from "path";
 import fs from "fs";
 import { uploadImageToSupabase, deleteImageFromSupabase } from "./supabase";
 import { googleSheetsService, type OrderData } from "./googleSheets";
-import { emailService } from "./emailService";
+import { emailService, type ContactMessageData } from "./emailService";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -406,6 +406,60 @@ export async function registerRoutes(app: Express): Promise<Server> {
         details: error instanceof Error ? error.message : "Unknown error",
         serviceAccountEmail: process.env.GOOGLE_SHEETS_CLIENT_EMAIL,
         sheetId: process.env.GOOGLE_SHEETS_SHEET_ID
+      });
+    }
+  });
+
+  // Contact message schema
+  const contactMessageSchema = z.object({
+    name: z.string().min(1, "Name is required"),
+    email: z.string().email("Valid email is required").optional().or(z.literal("")),
+    phone: z.string().optional(),
+    subject: z.string().optional(),
+    message: z.string().min(1, "Message is required")
+  });
+
+  // Contact message submission endpoint
+  app.post("/api/contact-message", async (req, res) => {
+    try {
+      const validatedData = contactMessageSchema.parse(req.body);
+      
+      // Prepare contact message data
+      const contactData = {
+        name: validatedData.name,
+        email: validatedData.email || '',
+        phone: validatedData.phone || '',
+        subject: validatedData.subject || '',
+        message: validatedData.message,
+        timestamp: new Date().toISOString()
+      };
+
+      // Send email notification
+      const emailSent = await emailService.sendContactMessage(contactData);
+      
+      if (emailSent) {
+        res.json({
+          success: true,
+          message: "Message sent successfully"
+        });
+      } else {
+        res.status(500).json({
+          error: "Failed to send message",
+          details: "Email notification could not be sent"
+        });
+      }
+
+    } catch (error) {
+      console.error("Error processing contact message:", error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({
+          error: "Invalid contact message data",
+          details: error.errors
+        });
+      }
+      res.status(500).json({
+        error: "Failed to process contact message",
+        details: error instanceof Error ? error.message : "Unknown error"
       });
     }
   });

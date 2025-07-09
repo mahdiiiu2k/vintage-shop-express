@@ -8,9 +8,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Navigation } from '@/components/Navigation';
 import { useCart } from '@/hooks/useCart';
 import { useToast } from '@/hooks/use-toast';
+import { apiRequest } from '@/lib/queryClient';
 
 const Contact = () => {
-
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -18,6 +18,7 @@ const Contact = () => {
     subject: '',
     message: ''
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { getTotalItems } = useCart();
   const { toast } = useToast();
 
@@ -29,20 +30,48 @@ const Contact = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (formData.name && formData.message) {
-      toast({
-        title: "Message Sent!",
-        description: "Thank you for your message. We'll get back to you soon.",
-      });
-      setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
-    } else {
+    
+    // Basic validation
+    if (!formData.name || !formData.message) {
       toast({
         title: "Please fill in all required fields",
         description: "Name and message are required.",
         variant: "destructive"
       });
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const response = await apiRequest('/api/contact-message', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData)
+      });
+
+      if (response.success) {
+        toast({
+          title: "Message Sent!",
+          description: "Thank you for your message. We'll get back to you soon.",
+        });
+        setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
+      } else {
+        throw new Error(response.error || 'Failed to send message');
+      }
+    } catch (error) {
+      console.error('Contact message submission error:', error);
+      toast({
+        title: "Failed to send message",
+        description: error instanceof Error ? error.message : "Please try again later.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -135,9 +164,9 @@ const Contact = () => {
                     required
                   />
                 </div>
-                <Button type="submit" size="lg" className="w-full h-12 text-base">
+                <Button type="submit" size="lg" className="w-full h-12 text-base" disabled={isSubmitting}>
                   <Send className="w-4 h-4 mr-2" />
-                  Send Message
+                  {isSubmitting ? 'Sending...' : 'Send Message'}
                 </Button>
               </form>
             </div>
