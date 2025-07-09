@@ -6,6 +6,8 @@ import { insertProductSchema } from "@shared/schema";
 import path from "path";
 import fs from "fs";
 import { uploadImageToSupabase, deleteImageFromSupabase } from "./supabase";
+import { googleSheetsService, type OrderData } from "./googleSheets";
+import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Products API routes
@@ -259,6 +261,133 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ 
         error: "Failed to create bucket", 
         details: error instanceof Error ? error.message : "Unknown error" 
+      });
+    }
+  });
+
+  // Order submission schema
+  const orderSubmissionSchema = z.object({
+    billingDetails: z.object({
+      name: z.string().min(1, "Name is required"),
+      wilaya: z.string().min(1, "Wilaya is required"),
+      city: z.string().min(1, "City is required"),
+      streetAddress: z.string().min(1, "Street address is required"),
+      phone: z.string().min(1, "Phone is required"),
+      email: z.string().email("Valid email is required"),
+      orderNotes: z.string().optional()
+    }),
+    items: z.array(z.object({
+      product: z.object({
+        id: z.number(),
+        name: z.string(),
+        price: z.string(),
+        category: z.string().optional(),
+        description: z.string().optional()
+      }),
+      selectedSize: z.string().min(1, "Size is required"),
+      selectedColor: z.string().min(1, "Color is required"),
+      quantity: z.number().min(1, "Quantity must be at least 1")
+    }))
+  });
+
+  // Order submission endpoint
+  app.post("/api/submit-order", async (req, res) => {
+    try {
+      const validatedData = orderSubmissionSchema.parse(req.body);
+      
+      // Test Google Sheets connection first
+      const connectionTest = await googleSheetsService.testConnection();
+      if (!connectionTest) {
+        return res.status(500).json({ 
+          error: "Google Sheets connection failed",
+          details: "Please check your Google Sheets configuration"
+        });
+      }
+
+      // Process each item in the order
+      const results = [];
+      for (const item of validatedData.items) {
+        const orderData: OrderData = {
+          customerName: validatedData.billingDetails.name,
+          wilaya: validatedData.billingDetails.wilaya,
+          city: validatedData.billingDetails.city,
+          streetAddress: validatedData.billingDetails.streetAddress,
+          phone: validatedData.billingDetails.phone,
+          email: validatedData.billingDetails.email,
+          productName: item.product.name,
+          size: item.selectedSize,
+          color: item.selectedColor,
+          price: item.product.price,
+          quantity: item.quantity,
+          orderNotes: validatedData.billingDetails.orderNotes || '',
+          orderDate: new Date().toISOString()
+        };
+
+        try {
+          await googleSheetsService.addOrder(orderData);
+          results.push({ 
+            success: true, 
+            productName: item.product.name,
+            message: "Order added to Google Sheets successfully"
+          });
+        } catch (error) {
+          console.error("Error adding order to Google Sheets:", error);
+          results.push({ 
+            success: false, 
+            productName: item.product.name,
+            error: error instanceof Error ? error.message : "Unknown error"
+          });
+        }
+      }
+
+      // Check if any orders failed
+      const failedOrders = results.filter(r => !r.success);
+      if (failedOrders.length > 0) {
+        return res.status(500).json({
+          error: "Some orders failed to process",
+          results: results
+        });
+      }
+
+      res.json({
+        success: true,
+        message: "Order submitted successfully",
+        results: results
+      });
+
+    } catch (error) {
+      console.error("Error submitting order:", error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({
+          error: "Invalid order data",
+          details: error.errors
+        });
+      }
+      res.status(500).json({
+        error: "Failed to submit order",
+        details: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  });
+
+  // Test Google Sheets connection endpoint
+  app.get("/api/test-google-sheets", async (req, res) => {
+    try {
+      const connectionTest = await googleSheetsService.testConnection();
+      if (connectionTest) {
+        res.json({
+          success: true,
+          message: "Google Sheets connection successful"
+        });
+      } else {
+        res.status(500).json({
+          error: "Google Sheets connection failed"
+        });
+      }
+    } catch (error) {
+      res.status(500).json({
+        error: "Google Sheets connection failed",
+        details: error instanceof Error ? error.message : "Unknown error"
       });
     }
   });

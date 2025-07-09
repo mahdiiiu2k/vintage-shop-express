@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Navigation } from '@/components/Navigation';
 import { useCart } from '@/hooks/useCart';
 import { useToast } from '@/hooks/use-toast';
+import { apiRequest } from '@/lib/queryClient';
 
 // Algerian wilayas and their cities
 const ALGERIA_DATA = {
@@ -65,7 +66,7 @@ const ALGERIA_DATA = {
 
 const Checkout = () => {
   const [, setLocation] = useLocation();
-  const { getTotalItems, clearCart } = useCart();
+  const { getTotalItems, clearCart, cartItems } = useCart();
   const { toast } = useToast();
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -113,25 +114,71 @@ const Checkout = () => {
       return;
     }
 
+    // Check if cart is empty
+    if (cartItems.length === 0) {
+      toast({
+        title: "Your cart is empty",
+        description: "Please add items to your cart before placing an order.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setIsProcessing(true);
     
     try {
-      // Simulate order processing
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      toast({
-        title: "Order completed successfully!",
-        description: "Your order has been placed and will be delivered soon.",
+      // Prepare order data for Google Sheets
+      const orderData = {
+        billingDetails: {
+          name: formData.name,
+          wilaya: formData.state,
+          city: formData.city,
+          streetAddress: formData.streetAddress,
+          phone: formData.phone,
+          email: formData.email,
+          orderNotes: formData.orderNotes
+        },
+        items: cartItems.map(item => ({
+          product: {
+            id: item.product.id,
+            name: item.product.name,
+            price: item.product.price,
+            category: item.product.category,
+            description: item.product.description
+          },
+          selectedSize: item.selectedSize,
+          selectedColor: item.selectedColor,
+          quantity: item.quantity
+        }))
+      };
+
+      // Submit order to Google Sheets
+      const response = await apiRequest('/api/submit-order', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(orderData)
       });
-      
-      // Clear cart and redirect
-      clearCart();
-      setLocation('/');
+
+      if (response.success) {
+        toast({
+          title: "Order completed successfully!",
+          description: "Your order has been placed and will be delivered soon.",
+        });
+        
+        // Clear cart and redirect
+        clearCart();
+        setLocation('/');
+      } else {
+        throw new Error(response.error || 'Failed to submit order');
+      }
       
     } catch (error) {
+      console.error('Order submission error:', error);
       toast({
         title: "Order failed",
-        description: "Please try again later.",
+        description: error instanceof Error ? error.message : "Please try again later.",
         variant: "destructive"
       });
     } finally {
