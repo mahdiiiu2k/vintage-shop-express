@@ -49,7 +49,7 @@ class GoogleSheetsService {
       // Check if sheet exists and has headers
       const response = await this.sheets.spreadsheets.values.get({
         spreadsheetId: this.sheetId,
-        range: 'A1:K1',
+        range: 'A1:L1',
       });
 
       const headers = response.data.values?.[0];
@@ -63,6 +63,7 @@ class GoogleSheetsService {
         'City',
         'Street Address',
         'Name',
+        'Quantity',
         'Price',
         'Order Notes'
       ];
@@ -70,7 +71,7 @@ class GoogleSheetsService {
       // Always update headers to ensure they're correct
       await this.sheets.spreadsheets.values.update({
         spreadsheetId: this.sheetId,
-        range: 'A1:K1',
+        range: 'A1:L1',
         valueInputOption: 'RAW',
         requestBody: {
           values: [expectedHeaders],
@@ -105,13 +106,14 @@ class GoogleSheetsService {
         orderData.city,
         orderData.streetAddress,
         orderData.customerName,
+        orderData.quantity.toString(),
         orderData.price,
         orderData.orderNotes || ''
       ];
 
       await this.sheets.spreadsheets.values.append({
         spreadsheetId: this.sheetId,
-        range: 'A:K',
+        range: 'A:L',
         valueInputOption: 'RAW',
         insertDataOption: 'INSERT_ROWS',
         requestBody: {
