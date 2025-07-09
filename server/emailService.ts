@@ -1,41 +1,40 @@
-import { google } from 'googleapis';
+import nodemailer from 'nodemailer';
 import type { OrderData } from './googleSheets';
 
 class EmailService {
-  private gmail: any;
+  private transporter: nodemailer.Transporter;
   private isConfigured: boolean = false;
 
   constructor() {
-    this.initializeGmailAPI();
+    this.initializeEmailService();
   }
 
-  private async initializeGmailAPI() {
+  private async initializeEmailService() {
     try {
-      // Gmail API requires additional setup (enabling API + domain delegation)
-      // For now, we'll provide email content that can be easily copied and sent
+      // Configure SMTP with Gmail App Password
+      this.transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: 'chouikimahdi@gmail.com',
+          pass: process.env.GMAIL_APP_PASSWORD
+        }
+      });
+
+      // Test the connection
+      await this.transporter.verify();
+      
       this.isConfigured = true;
-      console.log('Email notification service configured - ready to generate email content');
+      console.log('Gmail SMTP configured successfully for automatic email sending');
       console.log('- From: chouikimahdi@gmail.com');
       console.log('- To: chouikimahdiabderrahmane@gmail.com');
       console.log('- Subject: New Order');
     } catch (error) {
-      console.error('Failed to initialize email service:', error);
+      console.error('Failed to initialize Gmail SMTP:', error);
       this.isConfigured = false;
     }
   }
 
-  private createEmailMessage(to: string, subject: string, body: string): string {
-    const message = [
-      `To: ${to}`,
-      `From: chouikimahdi@gmail.com`,
-      `Subject: ${subject}`,
-      `Content-Type: text/plain; charset=utf-8`,
-      ``,
-      body
-    ].join('\n');
 
-    return Buffer.from(message).toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-  }
 
   async sendOrderNotification(orderData: OrderData): Promise<boolean> {
     try {
@@ -73,24 +72,44 @@ This order has been automatically saved to your Google Sheets.
 Best regards,
 E-commerce System`;
 
-      // Display comprehensive notification in console
+      // Display notification in console
       console.log('\n' + '='.repeat(80));
       console.log('🚨 NEW ORDER EMAIL NOTIFICATION 🚨');
       console.log('='.repeat(80));
-      console.log('EMAIL DETAILS:');
+      console.log('Sending email automatically...');
       console.log('From: chouikimahdi@gmail.com');
       console.log('To: chouikimahdiabderrahmane@gmail.com');
       console.log('Subject: ' + emailSubject);
-      console.log('');
-      console.log('EMAIL BODY:');
-      console.log(emailBody);
       console.log('='.repeat(80));
-      console.log('📧 EMAIL CONTENT READY FOR SENDING 📧');
-      console.log('Copy the above email content and send it manually from Gmail');
-      console.log('='.repeat(80) + '\n');
 
-      // For demonstration, we'll return true to indicate notification was prepared
-      return true;
+      // Send email automatically through Gmail SMTP
+      if (this.isConfigured) {
+        try {
+          const mailOptions = {
+            from: 'chouikimahdi@gmail.com',
+            to: 'chouikimahdiabderrahmane@gmail.com',
+            subject: emailSubject,
+            text: emailBody
+          };
+
+          const info = await this.transporter.sendMail(mailOptions);
+
+          console.log('✅ Email sent successfully via Gmail SMTP!');
+          console.log('Message ID:', info.messageId);
+          console.log('='.repeat(80) + '\n');
+          return true;
+        } catch (emailError) {
+          console.error('❌ Failed to send email via Gmail SMTP:', emailError);
+          console.log('Email content:');
+          console.log(emailBody);
+          console.log('='.repeat(80) + '\n');
+          return false;
+        }
+      } else {
+        console.log('❌ Gmail SMTP not configured - email not sent');
+        console.log('='.repeat(80) + '\n');
+        return false;
+      }
     } catch (error) {
       console.error('Failed to prepare order notification:', error);
       return false;
@@ -113,7 +132,7 @@ E-commerce System`;
 Test Details:
 • Date: ${testDate}
 • Status: Email notification system is working correctly
-• Method: Email content generation
+• Method: Gmail SMTP automatic sending
 
 This is a test to verify order email notifications are working.
 
@@ -123,19 +142,40 @@ E-commerce System`;
       console.log('\n' + '='.repeat(80));
       console.log('🧪 TEST EMAIL NOTIFICATION 🧪');
       console.log('='.repeat(80));
-      console.log('EMAIL DETAILS:');
+      console.log('Sending test email automatically...');
       console.log('From: chouikimahdi@gmail.com');
       console.log('To: chouikimahdiabderrahmane@gmail.com');
       console.log('Subject: ' + testEmailSubject);
-      console.log('');
-      console.log('EMAIL BODY:');
-      console.log(testEmailBody);
       console.log('='.repeat(80));
-      console.log('📧 TEST EMAIL CONTENT READY FOR SENDING 📧');
-      console.log('Copy the above email content and send it manually from Gmail');
-      console.log('='.repeat(80) + '\n');
 
-      return true;
+      // Send test email automatically through Gmail SMTP
+      if (this.isConfigured) {
+        try {
+          const mailOptions = {
+            from: 'chouikimahdi@gmail.com',
+            to: 'chouikimahdiabderrahmane@gmail.com',
+            subject: testEmailSubject,
+            text: testEmailBody
+          };
+
+          const info = await this.transporter.sendMail(mailOptions);
+
+          console.log('✅ Test email sent successfully via Gmail SMTP!');
+          console.log('Message ID:', info.messageId);
+          console.log('='.repeat(80) + '\n');
+          return true;
+        } catch (emailError) {
+          console.error('❌ Failed to send test email via Gmail SMTP:', emailError);
+          console.log('Email content:');
+          console.log(testEmailBody);
+          console.log('='.repeat(80) + '\n');
+          return false;
+        }
+      } else {
+        console.log('❌ Gmail SMTP not configured - test email not sent');
+        console.log('='.repeat(80) + '\n');
+        return false;
+      }
     } catch (error) {
       console.error('Test email notification failed:', error);
       return false;
