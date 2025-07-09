@@ -74,7 +74,7 @@ const Checkout = () => {
     streetAddress: '',
     state: 'Alger',
     city: '',
-    phone: '0XXXXXXXXX',
+    phone: '',
     email: '',
     orderNotes: ''
   });
@@ -170,6 +170,26 @@ const Checkout = () => {
               </div>
 
               <div>
+                <Label htmlFor="state">Wilaya *</Label>
+                <Input
+                  id="state"
+                  value={formData.state}
+                  onChange={(e) => handleInputChange('state', e.target.value)}
+                  required
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="city">City *</Label>
+                <Input
+                  id="city"
+                  value={formData.city}
+                  onChange={(e) => handleInputChange('city', e.target.value)}
+                  required
+                />
+              </div>
+
+              <div>
                 <Label htmlFor="streetAddress">Street address *</Label>
                 <Input
                   id="streetAddress"
@@ -178,38 +198,6 @@ const Checkout = () => {
                   onChange={(e) => handleInputChange('streetAddress', e.target.value)}
                   required
                 />
-              </div>
-
-              <div>
-                <Label htmlFor="state">State / County *</Label>
-                <Select value={formData.state} onValueChange={(value) => handleInputChange('state', value)}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {Object.keys(ALGERIA_DATA).map((wilaya) => (
-                      <SelectItem key={wilaya} value={wilaya}>
-                        {wilaya}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <Label htmlFor="city">Town / City *</Label>
-                <Select value={formData.city} onValueChange={(value) => handleInputChange('city', value)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a city..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {availableCities.map((city) => (
-                      <SelectItem key={city} value={city}>
-                        {city}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
               </div>
 
               <div>

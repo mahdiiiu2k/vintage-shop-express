@@ -59,21 +59,17 @@ export const ProductCard = ({ product, onAddToCart, className }: ProductCardProp
   };
 
   const handleQuickOrder = () => {
-    // Use default selections for quick order
-    const defaultSize = product.sizes[0] || '';
-    const defaultColor = product.colors[0] || '';
-    
-    if (!defaultSize || !defaultColor) {
+    if (!selectedSize || !selectedColor) {
       toast({
-        title: "Quick order unavailable",
-        description: "This product requires size and color selection.",
+        title: "Please select size and color",
+        description: "Both size and color are required for quick order.",
         variant: "destructive",
       });
       return;
     }
 
     // Add to cart and redirect to checkout
-    onAddToCart(product, defaultSize, defaultColor);
+    onAddToCart(product, selectedSize, selectedColor);
     setLocation('/checkout');
   };
 
@@ -239,13 +235,79 @@ export const ProductCard = ({ product, onAddToCart, className }: ProductCardProp
               </DialogContent>
             </Dialog>
             
-            <Button 
-              onClick={handleQuickOrder}
-              className="flex-1 text-xs sm:text-sm px-2 sm:px-3 min-w-0 bg-green-600 hover:bg-green-700 text-white border-0"
-            >
-              <Package className="w-3 h-3 sm:w-4 sm:h-4 mr-1 flex-shrink-0" />
-              <span className="hidden sm:inline">Order</span>
-            </Button>
+            <Dialog open={isQuickOrderOpen} onOpenChange={setIsQuickOrderOpen}>
+              <DialogTrigger asChild>
+                <Button className="flex-1 text-xs sm:text-sm px-2 sm:px-3 min-w-0 bg-green-600 hover:bg-green-700 text-white border-0">
+                  <Package className="w-3 h-3 sm:w-4 sm:h-4 mr-1 flex-shrink-0" />
+                  <span className="hidden sm:inline">Order</span>
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Quick Order - {product.name}</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <img
+                    src={product.image_url ? (product.image_url.startsWith('http') ? product.image_url : `${window.location.origin}${product.image_url}`) : "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=400&h=500&fit=crop"}
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      if (!target.src.includes('unsplash')) {
+                        target.src = "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=400&h=500&fit=crop";
+                      }
+                    }}
+                    alt={product.name}
+                    className="w-full h-48 object-cover rounded-lg"
+                  />
+                  <p className="text-sm text-muted-foreground">{product.description}</p>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-sm font-medium text-foreground mb-2 block">Size</label>
+                      <Select value={selectedSize} onValueChange={setSelectedSize}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select size" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {product.sizes.map(size => (
+                            <SelectItem key={size} value={size}>{size}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div>
+                      <label className="text-sm font-medium text-foreground mb-2 block">Color</label>
+                      <Select value={selectedColor} onValueChange={setSelectedColor}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select color" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {product.colors.map(color => (
+                            <SelectItem key={color} value={color}>{color}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <span className="text-2xl font-bold text-foreground">
+                      ${parseFloat(product.price).toFixed(2)}
+                    </span>
+                    <Button 
+                      onClick={() => {
+                        handleQuickOrder();
+                        setIsQuickOrderOpen(false);
+                      }} 
+                      className="px-6 bg-green-600 hover:bg-green-700 text-white"
+                    >
+                      <Package className="w-4 h-4 mr-2" />
+                      Order Now
+                    </Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
             
             <Dialog open={isAddToCartOpen} onOpenChange={setIsAddToCartOpen}>
               <DialogTrigger asChild>
