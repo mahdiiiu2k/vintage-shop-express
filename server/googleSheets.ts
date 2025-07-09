@@ -27,6 +27,11 @@ class GoogleSheetsService {
       throw new Error('GOOGLE_SHEETS_SHEET_ID is required');
     }
 
+    console.log('Google Sheets setup:');
+    console.log('- Sheet ID:', this.sheetId);
+    console.log('- Client Email:', process.env.GOOGLE_SHEETS_CLIENT_EMAIL);
+    console.log('- Private Key exists:', !!process.env.GOOGLE_SHEETS_PRIVATE_KEY);
+
     // Initialize Google Sheets API
     const auth = new google.auth.GoogleAuth({
       credentials: {

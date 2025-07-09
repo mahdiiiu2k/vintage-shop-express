@@ -373,21 +373,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Test Google Sheets connection endpoint
   app.get("/api/test-google-sheets", async (req, res) => {
     try {
+      console.log('Testing Google Sheets connection...');
+      console.log('Service account email:', process.env.GOOGLE_SHEETS_CLIENT_EMAIL);
+      console.log('Sheet ID:', process.env.GOOGLE_SHEETS_SHEET_ID);
+      
       const connectionTest = await googleSheetsService.testConnection();
       if (connectionTest) {
         res.json({
           success: true,
-          message: "Google Sheets connection successful"
+          message: "Google Sheets connection successful",
+          serviceAccountEmail: process.env.GOOGLE_SHEETS_CLIENT_EMAIL,
+          sheetId: process.env.GOOGLE_SHEETS_SHEET_ID
         });
       } else {
         res.status(500).json({
-          error: "Google Sheets connection failed"
+          error: "Google Sheets connection failed",
+          serviceAccountEmail: process.env.GOOGLE_SHEETS_CLIENT_EMAIL,
+          sheetId: process.env.GOOGLE_SHEETS_SHEET_ID
         });
       }
     } catch (error) {
+      console.error('Google Sheets test error:', error);
       res.status(500).json({
         error: "Google Sheets connection failed",
-        details: error instanceof Error ? error.message : "Unknown error"
+        details: error instanceof Error ? error.message : "Unknown error",
+        serviceAccountEmail: process.env.GOOGLE_SHEETS_CLIENT_EMAIL,
+        sheetId: process.env.GOOGLE_SHEETS_SHEET_ID
       });
     }
   });
