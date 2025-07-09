@@ -153,9 +153,16 @@ Changelog:
   * Integrated Google Sheets API for order data storage
   * Created service account authentication with proper permissions
   * Implemented order submission endpoint with Algerian billing format
-  * Added custom column order: Order Date, Product Name, Size, Color, Phone, Wilaya, City, Street Address, Name, Price, Order Notes
+  * Added custom column order: Order Date, Product Name, Size, Color, Phone, Wilaya, City, Street Address, Name, Quantity, Price, Order Notes
   * Successfully tested end-to-end order flow from checkout to Google Sheets
   * Orders now automatically sync to Google Sheets for delivery management
+- July 09, 2025: Order notification system implementation:
+  * Created comprehensive order notification system with console logging
+  * Implemented immediate order alerts displayed in server console
+  * Added detailed order information including customer details and product info
+  * Notifications trigger automatically when orders are placed
+  * Test endpoint available at /api/test-notifications for verification
+  * Successfully tested complete order flow with real-time notifications
 ```
 
 ## User Preferences
