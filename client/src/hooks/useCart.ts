@@ -100,6 +100,18 @@ export const useCart = () => {
     setCartItems([]);
   };
 
+  const addQuickOrderItem = (product: Product, size: string, color: string) => {
+    // Clear cart first, then add only this item
+    const newItem: CartItem = {
+      id: Date.now(),
+      product,
+      quantity: 1,
+      selectedSize: size,
+      selectedColor: color,
+    };
+    setCartItems([newItem]);
+  };
+
   return {
     cartItems,
     addToCart,
@@ -108,5 +120,6 @@ export const useCart = () => {
     getTotalPrice,
     getTotalItems,
     clearCart,
+    addQuickOrderItem,
   };
 };

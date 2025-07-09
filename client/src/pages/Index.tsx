@@ -28,7 +28,7 @@ const Index = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const { addToCart, getTotalItems } = useCart();
+  const { addToCart, addQuickOrderItem, getTotalItems } = useCart();
   const { toast } = useToast();
 
   // Load products from API
@@ -245,6 +245,7 @@ const Index = () => {
                   key={product.id}
                   product={product}
                   onAddToCart={addToCart}
+                  onQuickOrder={addQuickOrderItem}
                 />
               ))}
             </div>

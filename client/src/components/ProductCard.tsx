@@ -26,10 +26,11 @@ interface Product {
 interface ProductCardProps {
   product: Product;
   onAddToCart: (product: Product, size: string, color: string) => void;
+  onQuickOrder?: (product: Product, size: string, color: string) => void;
   className?: string;
 }
 
-export const ProductCard = ({ product, onAddToCart, className }: ProductCardProps) => {
+export const ProductCard = ({ product, onAddToCart, onQuickOrder, className }: ProductCardProps) => {
   const [selectedSize, setSelectedSize] = useState('');
   const [selectedColor, setSelectedColor] = useState('');
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
@@ -68,12 +69,19 @@ export const ProductCard = ({ product, onAddToCart, className }: ProductCardProp
       return;
     }
 
-    // Add to cart and redirect to checkout after a small delay to ensure cart state is updated
-    onAddToCart(product, selectedSize, selectedColor);
+    // Use the quick order function if provided, otherwise fallback to regular add to cart
+    if (onQuickOrder) {
+      onQuickOrder(product, selectedSize, selectedColor);
+    } else {
+      // For quick order, we need to clear the cart first and then add only this item
+      // This ensures only one product is ordered
+      localStorage.removeItem('vintageStyle-cart');
+      onAddToCart(product, selectedSize, selectedColor);
+    }
     
     // Use setTimeout to ensure cart state is updated before navigation
     setTimeout(() => {
-      setLocation('/checkout');
+      setLocation('/checkout?quick=true');
     }, 100);
   };
 

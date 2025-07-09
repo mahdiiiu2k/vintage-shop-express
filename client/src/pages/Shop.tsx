@@ -32,7 +32,7 @@ const Shop = () => {
   const [sortBy, setSortBy] = useState('featured');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [priceRange, setPriceRange] = useState('all');
-  const { addToCart, getTotalItems } = useCart();
+  const { addToCart, addQuickOrderItem, getTotalItems } = useCart();
   const { toast } = useToast();
 
   const refreshProducts = async () => {
@@ -361,6 +361,7 @@ const Shop = () => {
                 key={product.id}
                 product={product}
                 onAddToCart={addToCart}
+                onQuickOrder={addQuickOrderItem}
                 className={viewMode === 'list' ? 'flex flex-row' : ''}
               />
             ))}
