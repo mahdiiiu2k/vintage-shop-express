@@ -179,6 +179,15 @@ Changelog:
   * Real-time email delivery when orders are placed
   * Successfully tested automatic email flow with real orders
   * Email notifications now fully automated without manual intervention required
+- July 10, 2025: Netlify deployment preparation:
+  * Converted Express.js backend to Netlify Functions for serverless deployment
+  * Created netlify.toml configuration for proper build and function settings
+  * Converted all API routes to individual Netlify Functions (products, submit-order, contact-message, sync-image, etc.)
+  * Added CORS headers and proper error handling for serverless environment
+  * Created comprehensive deployment guide with environment variable requirements
+  * Maintained all existing functionality: database, Google Sheets, email notifications, Supabase Storage
+  * Fixed deployment issues that occurred with Vercel and Railway by using Netlify's serverless architecture
+  * No more "sleeping" or health check failures - functions wake instantly
 ```
 
 ## User Preferences
