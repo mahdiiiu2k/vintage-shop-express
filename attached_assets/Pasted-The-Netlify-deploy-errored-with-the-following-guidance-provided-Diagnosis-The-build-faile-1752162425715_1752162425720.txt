@@ -1,0 +1,109 @@
+The Netlify deploy errored, with the following guidance provided:
+
+**Diagnosis:**
+The build failed because the specified build command `npm run build:netlify` was missing from the project's `package.json` file, leading to a "Missing script" npm error [#L71].
+
+**Solution:**
+1. Open your project's `package.json` file.
+2. Check if the script `build:netlify` is defined under the `scripts` section.
+3. If the script is missing, add it like this:
+   ```json
+   "scripts": {
+     "build:netlify": "your build command here"
+   }
+   ```
+4. Replace `"your build command here"` with the actual build command you want to execute for Netlify builds.
+5. Save the `package.json` file and commit the changes to your repository.
+6. Trigger a new build on Netlify to verify that the issue is resolved.
+
+The relevant error logs are:
+
+Line 0: build-image version: 068c1c7d7725d329cc382184c7bbf62ac27e2c09 (noble)
+Line 1: buildbot version: 068c1c7d7725d329cc382184c7bbf62ac27e2c09
+Line 2: Fetching cached dependencies
+Line 3: Failed to fetch cache, continuing with build
+Line 4: Starting to prepare the repo for build
+Line 5: No cached dependencies found. Cloning fresh repo
+Line 6: git clone --filter=blob:none https://github.com/mahdiiiu2k/vintage-shop-express
+Line 7: Preparing Git Reference refs/heads/main
+Line 8: Custom functions path detected. Proceeding with the specified path: 'netlify/functions'
+Line 9: Custom build command detected. Proceeding with the specified command: 'npm run build:netlify'
+Line 10: Starting to install dependencies
+Line 11: Using PHP version
+Line 12: Downloading and installing node v18.20.8...
+Line 13: Downloading https://nodejs.org/dist/v18.20.8/node-v18.20.8-linux-x64.tar.xz...
+Line 26: npm warn EBADENGINE Unsupported engine {
+Line 27: npm warn EBADENGINE   package: 'react-router@7.6.3',
+Line 28: npm warn EBADENGINE   required: { node: '>=20.0.0' },
+Line 29: npm warn EBADENGINE   current: { node: 'v18.20.8', npm: '10.8.2' }
+Line 30: npm warn EBADENGINE }
+Line 31: npm warn EBADENGINE Unsupported engine {
+Line 32: npm warn EBADENGINE   package: 'react-router-dom@7.6.3',
+Line 33: npm warn EBADENGINE   required: { node: '>=20.0.0' },
+Line 34: npm warn EBADENGINE   current: { node: 'v18.20.8', npm: '10.8.2' }
+Line 35: npm warn EBADENGINE }
+Line 36: npm warn deprecated node-domexception@1.0.0: Use your platform's native DOMException instead
+npm warn deprecated @esbuild-kit/es
+Line 37: npm warn deprecated @esbuild-kit/core-utils@3.3.2: Merged into tsx: https://tsx.is
+Line 38: added 789 packages in 22s
+Line 39: npm packages installed
+Line 40: Successfully installed dependencies
+Line 41: Starting build script
+Line 42: Detected 1 framework(s)
+Line 43: "vite" at version "5.4.14"
+Line 44: Section completed: initializing
+Line 45: [96m[1m​[22m[39m
+Line 46: [96m[1mNetlify Build                                                 [22m[39m
+Line 61: [36m[1m❯ Config file[22m[39m
+Line 62:   /opt/build/repo/netlify.toml
+Line 63: [36m[1m​[22m[39m
+Line 64: [36m[1m❯ Context[22m[39m
+Line 65:   production
+Line 66: [96m[1m​[22m[39m
+Line 67: [96m[1mbuild.command from netlify.toml                               [22m[39m
+Line 68: [96m[1m────────────────────────────────────────────────────────────────[22m[39m
+Line 69: ​
+Line 70: [36m$ npm run build:netlify[39m
+Line 71: npm error Missing script: "build:netlify"
+Line 72: npm error
+Line 73: npm error To see a list of scripts, run:
+Line 74: npm error   npm run
+Line 75: npm error A complete log of this run can be found in: /opt/buildhome/.npm/_logs/2025-07-10T15_26_02_692Z-debug-0.log
+Line 76: [91m[1m​[22m[39m
+Line 77: [91m[1m"build.command" failed                                        [22m[39m
+Line 78: [91m[1m────────────────────────────────────────────────────────────────[22m[39m
+Line 79: ​
+Line 80:   [31m[1mError message[22m[39m
+Line 81:   Command failed with exit code 1: npm run build:netlify
+Line 82: ​
+Line 83:   [31m[1mError location[22m[39m
+Line 84:   In build.command from netlify.toml:
+Line 85:   npm run build:netlify
+Line 86: ​
+Line 87:   [31m[1mResolved config[22m[39m
+Line 88:   build:
+Line 89:     command: npm run build:netlify
+Line 90:     commandOrigin: config
+Line 91:     environment:
+Line 92:       - DATABASE_URL
+Line 93:       - GMAIL_APP_PASSWORD
+Line 100:       - VITE_SUPABASE_ANON_KEY
+Line 101:       - VITE_SUPABASE_URL
+Line 102:       - NODE_VERSION
+Line 103:     publish: /opt/build/repo/dist/public
+Line 104:     publishOrigin: config
+Line 105:   functions:
+Line 106:     "*":
+Line 107:       node_bundler: esbuild
+Line 108:   functionsDirectory: /opt/build/repo/netlify/functions
+Line 109:   redirects:
+Line 110: Failed during stage 'building site': Build script returned non-zero exit code: 2
+Line 111:     - from: /api/*
+      status: 200
+      to: /.netlify/functions/:splat
+    - from: /*
+      status: 200
+      to: /index.html
+Line 112: Build failed due to a user error: Build script returned non-zero exit code: 2
+Line 113: Failing build: Failed to build site
+Line 114: Finished processing build request in 33.244s
